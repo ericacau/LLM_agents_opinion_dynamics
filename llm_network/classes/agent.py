@@ -55,7 +55,6 @@ class Agent(object):
 
 
 class Agents(object):
-
     def __init__(self):
         self.agents = {}
 
@@ -75,4 +74,3 @@ class Agents(object):
     def agents_iter(self):
         for k, v in self.agents.items():
             yield k, v
-

@@ -1,16 +1,18 @@
 from .agent import Agent, Agents
-from autogen import AssistantAgent, UserProxyAgent, oai
-import autogen
-from autogen import AssistantAgent, GroupChatManager, UserProxyAgent
-from autogen.agentchat import GroupChat
+from autogen import AssistantAgent
 import re
+import tqdm
 
 
 class Monitor(object):
-    def __init__(self, llm_config: dict):
+    def __init__(
+        self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False
+    ):
         self.agents = None
         self.statuses = {}
         self.llm_config = llm_config
+        self.verbose = verbose
+        self.save_agents_debates = save_agents_debates
 
     def get_statuses(self):
         return self.statuses
@@ -23,21 +25,30 @@ class Monitor(object):
     def iteration(self, theme: str):
         for n1, agent_1 in self.agents.agents_iter():
             agent_2 = agent_1.get_random_neighbor()
-            new_status = self.debate(agent_1, agent_2, theme)
+            new_status, text = self.debate(agent_1, agent_2, theme)
 
             self.statuses[n1] = new_status
             agent_1.set_status(new_status)
-
-            print(self.statuses)
+            if self.save_agents_debates:
+                yield {
+                    **self.statuses,
+                    "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                    "opponent_statement": text,
+                }
+            else:
+                yield {
+                    **self.statuses,
+                    "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                }
 
     def iteration_bunch(self, n: int, themes: object):
-        for i in range(n):
+        for i in tqdm.tqdm(range(n)):
             if isinstance(themes, str):
-                self.iteration(themes)
+                yield self.iteration(themes)
             else:
-                self.iteration(themes[i])
+                yield self.iteration(themes[i])
 
-    def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> float:
+    def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (float, str):
         u1 = AssistantAgent(
             name=f"{agent_1.name}",
             llm_config=self.llm_config,
@@ -53,6 +64,7 @@ class Monitor(object):
             Constraints:
             - At the end of each interaction write the value of your updated opinion in the following format: "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
             """,
+            max_consecutive_auto_reply=1,
         )
 
         u2 = AssistantAgent(
@@ -70,34 +82,25 @@ class Monitor(object):
             - Stick to your initial opinion.
             - You cannot change your opinion while trying to persuade {agent_1.name}.""",
             llm_config=self.llm_config,
+            max_consecutive_auto_reply=1,
         )
-
-        groupchat = GroupChat(
-            agents=[u1, u2],
-            messages=[],
-            max_round=3,
-        )
-        manager = GroupChatManager(groupchat=groupchat, llm_config=self.llm_config)
 
         u1.initiate_chat(
-            manager,
+            u2,
             message=f""" What do you think of the following statement?: "{theme}" """,
+            silent=not self.verbose,  # default is False
+            max_round=3,  # default is 3
         )
 
-        final_text = u1.chat_messages[manager][-1]["content"]
+        final_text = u1.chat_messages[u2][-1]["content"]
+
+        text = None
+        if self.save_agents_debates:
+            text = u1.chat_messages[u2][1]["content"]
+
         nb = re.findall(r"[0-9]+", final_text)
 
         if len(nb) > 0:
-            print(
-                f"Interaction: {u1.name}, {u2.name}. \n"
-                f"Initial opinions: {agent_1.get_status()}, {agent_2.get_status()}. \n"
-                f"Final opinions: {int(nb[-1])}"
-            )
-            return int(nb[-1])
+            return int(nb[-1]), text
         else:
-            print(
-                f"Interaction: {u1.name}, {u2.name}. \n"
-                f"Initial opinions: {agent_1.get_status()}, {agent_2.get_status()}. \n"
-                f"Final opinions: {agent_1.get_status()}"
-            )
-            return agent_1.get_status()
+            return agent_1.get_status(), text
