@@ -9,9 +9,13 @@ config_list = [
     }
 ]
 
-llm_config = {"config_list": config_list, "seed": 42, "request_timeout": 1200,}
+llm_config = {
+    "config_list": config_list,
+    "seed": 42,
+    "request_timeout": 1200,
+}
 
-a1 = Agent(name="a1", status=5, age=30)
+a1 = Agent(name="a1", status=9, age=30)
 a2 = Agent(name="a2", status=6, age=14)
 a3 = Agent(name="a3", status=8, age=37)
 a4 = Agent(name="a4", status=1, age=75)
@@ -26,5 +30,7 @@ agents.add_agents([a1, a2, a3, a4])
 
 monitor = Monitor(llm_config)
 monitor.set_agents(agents)
+
+print(monitor.statuses)
 
 monitor.iteration_bunch(10, "Gun control is a good idea.")
