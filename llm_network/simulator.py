@@ -1,4 +1,6 @@
-from llm_network.classes import Agent, Agents, Monitor
+import networkx as nx
+
+from llm_network.classes import Network, Monitor
 import json
 
 
@@ -13,8 +15,8 @@ class LLMOpinionSimulator(object):
         self.llm_config = llm_config
         self.verbose = verbose
 
-    def set_agents(self, agents: Agents):
-        self.monitor.set_agents(agents)
+    def set_agents(self, agents: Network):
+        self.monitor.set_agents(agents.get_agents())
 
     def run(
         self, n_iterations: int, themes: object, output_file: str = "results.jsonl"
@@ -50,23 +52,13 @@ if __name__ == "__main__":
 
     theme = "'Big Data' is only an empty buzz word."
 
-    # Create agents
-    a1 = Agent(name="a1", status=9)
-    a2 = Agent(name="a2", status=3)
-    a3 = Agent(name="a3", status=7)
-    a4 = Agent(name="a4", status=1)
-
-    # create network
-    a1.add_neighbors([a2, a3])
-    a2.add_neighbors([a1, a4])
-    a3.add_neighbors([a1, a4])
-    a4.add_neighbors([a2, a3])
-
-    # prepare agents set
-    agents = Agents()
-    agents.add_agents([a1, a2, a3, a4])
+    # Create a network of agents from files
+    net = Network()
+    net.add_agents("example_agents.json")
+    g = nx.read_edgelist("example_net.csv", delimiter=",", nodetype=str)
+    net.set_network(g)
 
     # run the simulation
     sim = LLMOpinionSimulator(llm_config, verbose=False, save_agents_debates=True)
-    sim.set_agents(agents)
+    sim.set_agents(net)
     sim.run(n_iterations=10, themes=theme, output_file="results.jsonl")
