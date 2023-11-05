@@ -5,12 +5,16 @@ import networkx as nx
 
 class Network(object):
     def __init__(self):
+        """
+        Initialize the network.
+        """
         self.agents = Agents()
         self.g = None
 
     def set_network(self, g: nx.Graph):
         """
         Set the network of the agents.
+
         :param g:
         :return:
         """

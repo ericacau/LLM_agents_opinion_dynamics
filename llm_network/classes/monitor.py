@@ -8,21 +8,45 @@ class Monitor(object):
     def __init__(
         self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False
     ):
+        """
+        LLM Opinion Simulator
+
+        :param llm_config:
+        :param verbose:
+        :param save_agents_debates:
+        """
         self.agents = None
         self.statuses = {}
         self.llm_config = llm_config
         self.verbose = verbose
         self.save_agents_debates = save_agents_debates
 
-    def get_statuses(self):
+    def get_statuses(self) -> dict:
+        """
+        Get the statuses of the agents
+
+        :return:
+        """
         return self.statuses
 
     def set_agents(self, agents: Agents):
+        """
+        Set the agents in the monitor
+
+        :param agents:
+        :return:
+        """
         self.agents = agents
         for name, agent in self.agents.agents_iter():
             self.statuses[name] = agent.get_status()
 
-    def iteration(self, theme: str):
+    def iteration(self, theme: str) -> object:
+        """
+        Run an iteration of the simulation
+
+        :param theme:
+        :return:
+        """
         for n1, agent_1 in self.agents.agents_iter():
             agent_2 = agent_1.get_random_neighbor()
             new_status, text = self.debate(agent_1, agent_2, theme)
@@ -44,7 +68,14 @@ class Monitor(object):
                     "opinion_variation": original_status - new_status,
                 }
 
-    def iteration_bunch(self, n: int, themes: object):
+    def iteration_bunch(self, n: int, themes: object) -> object:
+        """
+        Run a bunch of iterations
+
+        :param n:
+        :param themes:
+        :return:
+        """
         for i in tqdm.tqdm(range(n)):
             if isinstance(themes, str):
                 yield self.iteration(themes)
@@ -52,6 +83,14 @@ class Monitor(object):
                 yield self.iteration(themes[i])
 
     def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (float, str):
+        """
+        Run a debate between two agents
+
+        :param agent_1:
+        :param agent_2:
+        :param theme:
+        :return:
+        """
         u1 = AssistantAgent(
             name=f"{agent_1.name}",
             llm_config=self.llm_config,

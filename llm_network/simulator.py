@@ -8,6 +8,13 @@ class LLMOpinionSimulator(object):
     def __init__(
         self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False
     ):
+        """
+        LLM Opinion Simulator
+
+        :param llm_config:
+        :param verbose:
+        :param save_agents_debates:
+        """
         self.monitor = Monitor(
             llm_config, verbose=False, save_agents_debates=save_agents_debates
         )
@@ -16,11 +23,23 @@ class LLMOpinionSimulator(object):
         self.verbose = verbose
 
     def set_agents(self, agents: Network):
+        """
+        Set the agents in the monitor
+        :param agents:
+        :return:
+        """
         self.monitor.set_agents(agents.get_agents())
 
     def run(
         self, n_iterations: int, themes: object, output_file: str = "results.jsonl"
     ):
+        """"
+        Run the simulation
+
+        :param n_iterations: number of iterations
+        :param themes: themes to be discussed
+        :param output_file: output file
+        """
         with open(output_file, "w") as f:
             initial_statuses = {"status": self.monitor.statuses}
             f.write(f"{json.dumps(initial_statuses)}\n")
