@@ -27,18 +27,21 @@ class Monitor(object):
             agent_2 = agent_1.get_random_neighbor()
             new_status, text = self.debate(agent_1, agent_2, theme)
 
+            original_status = self.statuses[n1]
             self.statuses[n1] = new_status
             agent_1.set_status(new_status)
             if self.save_agents_debates:
                 yield {
-                    **self.statuses,
+                    "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                    "opinion_variation": original_status - new_status,
                     "opponent_statement": text,
                 }
             else:
                 yield {
-                    **self.statuses,
+                    "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                    "opinion_variation": original_status - new_status,
                 }
 
     def iteration_bunch(self, n: int, themes: object):
@@ -57,9 +60,9 @@ class Monitor(object):
             In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", your initial opinion toward the proposed discussion topic is {agent_1.get_status()}.
             
             Task:
-            - Listen to the opinions of {agent_2.name} and, if convinced, update your opinion. 
+            - Listen to the opinions of {agent_2.name} on the topic discussed and, if convinced, update your own. 
             - You can always maintain your initial opinion if {agent_2.name} message is shallow.
-            - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed) unless you are convinced.
+            - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed).
             
             Constraints:
             - At the end of each interaction write the value of your updated opinion in the following format: "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
@@ -71,14 +74,14 @@ class Monitor(object):
             name=f"{agent_2.name}",
             system_message=f"""Agent {agent_2.name}.
             You are a human being allowed to have his own opinions.
-            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", your initial opinion is {agent_2.get_status()}.
+            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", your initial opinion on the proposed topic is {agent_2.get_status()}.
             
             Task:
             - Support your opinion by providing arguments.
-            - Persuade {agent_1.name} to adopt an opinion of {agent_2.get_status()}. 
-            
+            - Your arguments should be as convincing as possible and MUST support an opinion of {agent_2.get_status()} for the proposed topic.
+                
             Constraints:
-            - Do not disclose for any reason your initial opinion.
+            - Do not disclose for any reason your opinion.
             - Stick to your initial opinion.
             - You cannot change your opinion while trying to persuade {agent_1.name}.""",
             llm_config=self.llm_config,

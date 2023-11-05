@@ -20,7 +20,8 @@ class LLMOpinionSimulator(object):
         self, n_iterations: int, themes: object, output_file: str = "results.jsonl"
     ):
         with open(output_file, "w") as f:
-            f.write(f"{json.dumps(self.monitor.statuses)}\n")
+            initial_statuses = {"status": self.monitor.statuses}
+            f.write(f"{json.dumps(initial_statuses)}\n")
             iterations = self.monitor.iteration_bunch(n_iterations, themes=themes)
             for it in iterations:
                 for i in it:
