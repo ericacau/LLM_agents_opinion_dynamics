@@ -15,8 +15,7 @@ class Network(object):
         """
         Set the network of the agents.
 
-        :param g:
-        :return:
+        :param g: a networkx graph
         """
         self.g = g
         for _, agent in self.agents.agents_iter():
@@ -28,7 +27,6 @@ class Network(object):
         Add agents to the network from a json file.
 
         :param filename: path to the json file
-        :type filename: str
         """
         with open(filename, "r") as f:
             data = json.load(f)
@@ -41,6 +39,5 @@ class Network(object):
         Return the agents of the network.
 
         :return: the agents of the network
-        :rtype: Agents
         """
         return self.agents

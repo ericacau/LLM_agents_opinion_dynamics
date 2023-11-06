@@ -11,9 +11,9 @@ class Monitor(object):
         """
         LLM Opinion Simulator
 
-        :param llm_config:
-        :param verbose:
-        :param save_agents_debates:
+        :param llm_config: endpoint configuration
+        :param verbose: whether to print or not the LLM output
+        :param save_agents_debates: whether to save the debates of the agents
         """
         self.agents = None
         self.statuses = {}
@@ -25,7 +25,7 @@ class Monitor(object):
         """
         Get the statuses of the agents
 
-        :return:
+        :return: the statuses of the agents
         """
         return self.statuses
 
@@ -33,7 +33,7 @@ class Monitor(object):
         """
         Set the agents in the monitor
 
-        :param agents:
+        :param agents: a list of Agent objects
         :return:
         """
         self.agents = agents
@@ -44,8 +44,8 @@ class Monitor(object):
         """
         Run an iteration of the simulation
 
-        :param theme:
-        :return:
+        :param theme: theme to be discussed
+        :return: a dictionary with the results of the iteration
         """
         for n1, agent_1 in self.agents.agents_iter():
             agent_2 = agent_1.get_random_neighbor()
@@ -72,9 +72,9 @@ class Monitor(object):
         """
         Run a bunch of iterations
 
-        :param n:
-        :param themes:
-        :return:
+        :param n: number of iterations, each involving a debate for each agent in the network
+        :param themes: themes to be discussed
+        :return: a generator of dictionaries with the results of the iterations
         """
         for i in tqdm.tqdm(range(n)):
             if isinstance(themes, str):

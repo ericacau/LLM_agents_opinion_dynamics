@@ -11,9 +11,9 @@ class LLMOpinionSimulator(object):
         """
         LLM Opinion Simulator
 
-        :param llm_config:
-        :param verbose:
-        :param save_agents_debates:
+        :param llm_config: endpoint configuration
+        :param verbose: whether to print or not the LLM output
+        :param save_agents_debates: whether to save the debates of the agents
         """
         self.monitor = Monitor(
             llm_config, verbose=False, save_agents_debates=save_agents_debates
@@ -25,15 +25,15 @@ class LLMOpinionSimulator(object):
     def set_agents(self, agents: Network):
         """
         Set the agents in the monitor
-        :param agents:
-        :return:
+
+        :param agents: network of agents
         """
         self.monitor.set_agents(agents.get_agents())
 
     def run(
         self, n_iterations: int, themes: object, output_file: str = "results.jsonl"
     ):
-        """"
+        """
         Run the simulation
 
         :param n_iterations: number of iterations

@@ -6,9 +6,9 @@ class Agent(object):
         """
         Initialize the Agent object.
 
-        :param name:
-        :param status:
-        :param kwargs:
+        :param name: name of the agent
+        :param status: status of the agent, integer between 1 and 10
+        :param kwargs: additional parameters
         """
         self.name = name
         self.profile = kwargs
@@ -19,7 +19,7 @@ class Agent(object):
         """
         Return the status of the agent
 
-        :return:
+        :return: status of the agent
         """
         return self.status
 
@@ -27,20 +27,23 @@ class Agent(object):
         """
         Set the status of the agent
 
-        :param status:
-        :return:
+        :param status: status of the agent, integer between 1 and 10
         """
         self.status = status
 
     def __str__(self) -> str:
         """
         Return a string representation of the Profile object.
+
+        :return: agent representation
         """
-        return f"Name: {self.name}"
+        return f"Name: {self.name}, Status: {self.status}"
 
     def __dict__(self) -> dict:
         """
         Return a dictionary representation of the Profile object.
+
+        :return: agent representation
         """
         return {"name": self.name, **self.profile}
 
@@ -48,8 +51,7 @@ class Agent(object):
         """
         Add a neighbor to the agent
 
-        :param neighbor:
-        :return:
+        :param neighbor: an Agent object
         """
         self.neighbors[neighbor.name] = neighbor
 
@@ -57,8 +59,7 @@ class Agent(object):
         """
         Add a list of neighbors to the agent
 
-        :param neighbors:
-        :return:
+        :param neighbors: a list of Agent objects
         """
         for neighbor in neighbors:
             self.add_neighbor(neighbor)
@@ -67,8 +68,8 @@ class Agent(object):
         """
         Get a neighbor by name
 
-        :param name:
-        :return:
+        :param name: name of the neighbor
+        :return: an Agent object
         """
         return self.neighbors[name]
 
@@ -76,7 +77,7 @@ class Agent(object):
         """
         Get a random neighbor
         
-        :return: 
+        :return: an Agent object
         """
         return random.choice(list(self.neighbors.values()))
 
@@ -84,7 +85,7 @@ class Agent(object):
         """
         Get all the neighbors of the agent
         
-        :return: 
+        :return: a lis of Agent objects
         """
         return list(self.neighbors.values())
 
@@ -92,7 +93,7 @@ class Agent(object):
         """
         Iterate over the neighbors of the agent
         
-        :return: 
+        :return: an iterator over the neighbors of the agent
         """
         for k, v in self.neighbors.items():
             yield k, v
@@ -109,8 +110,7 @@ class Agents(object):
         """
         Add an agent to the Agents object
 
-        :param agent:
-        :return:
+        :param agent: an Agent object
         """
         self.agents[agent.name] = agent
 
@@ -118,8 +118,8 @@ class Agents(object):
         """
         Get an agent by name
         
-        :param name: 
-        :return: 
+        :param name: name of the agent
+        :return: an Agent object
         """
         return self.agents[name]
 
@@ -127,8 +127,7 @@ class Agents(object):
         """
         Add a list of agents to the Agents object
 
-        :param agents:
-        :return:
+        :param agents: a list of Agent objects
         """
         for agent in agents:
             self.add_agent(agent)
@@ -137,7 +136,7 @@ class Agents(object):
         """
         Get a random agent
         
-        :return: 
+        :return: an Agent object
         """
         return random.choice(list(self.agents.values()))
 
@@ -145,7 +144,7 @@ class Agents(object):
         """
         Iterate over the agents
         
-        :return: 
+        :return: an iterator over the agents
         """
         for k, v in self.agents.items():
             yield k, v
