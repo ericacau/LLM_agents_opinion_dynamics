@@ -14,6 +14,7 @@ class Agent(object):
         self.profile = kwargs
         self.neighbors = {}
         self.status = status
+        self.args = kwargs
 
     def get_status(self) -> int:
         """
@@ -76,7 +77,7 @@ class Agent(object):
     def get_random_neighbor(self) -> object:
         """
         Get a random neighbor
-        
+
         :return: an Agent object
         """
         return random.choice(list(self.neighbors.values()))
@@ -84,7 +85,7 @@ class Agent(object):
     def get_neighbors(self) -> list:
         """
         Get all the neighbors of the agent
-        
+
         :return: a lis of Agent objects
         """
         return list(self.neighbors.values())
@@ -92,7 +93,7 @@ class Agent(object):
     def neighbors_iter(self) -> object:
         """
         Iterate over the neighbors of the agent
-        
+
         :return: an iterator over the neighbors of the agent
         """
         for k, v in self.neighbors.items():
@@ -117,7 +118,7 @@ class Agents(object):
     def get_agent(self, name: str) -> object:
         """
         Get an agent by name
-        
+
         :param name: name of the agent
         :return: an Agent object
         """
@@ -135,7 +136,7 @@ class Agents(object):
     def get_random_agent(self) -> object:
         """
         Get a random agent
-        
+
         :return: an Agent object
         """
         return random.choice(list(self.agents.values()))
@@ -143,7 +144,7 @@ class Agents(object):
     def agents_iter(self) -> object:
         """
         Iterate over the agents
-        
+
         :return: an iterator over the agents
         """
         for k, v in self.agents.items():

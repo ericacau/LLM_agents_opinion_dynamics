@@ -1,12 +1,17 @@
 import networkx as nx
 
-from llm_network.classes import Network, Monitor
+import llm_network.classes as llmn
 import json
+import sys
 
 
 class LLMOpinionSimulator(object):
     def __init__(
-        self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False
+        self,
+        llm_config: dict,
+        verbose: bool = False,
+        save_agents_debates: bool = False,
+        monitor_type: str = "Monitor",
     ):
         """
         LLM Opinion Simulator
@@ -14,15 +19,19 @@ class LLMOpinionSimulator(object):
         :param llm_config: endpoint configuration
         :param verbose: whether to print or not the LLM output
         :param save_agents_debates: whether to save the debates of the agents
+        :param monitor_type: type of monitor to be used (e.g., Monitor, MonitorBoundedConfidence)
         """
-        self.monitor = Monitor(
+
+        monitor = getattr(llmn, monitor_type)
+
+        self.monitor = monitor(
             llm_config, verbose=False, save_agents_debates=save_agents_debates
         )
         self.statuses = {}
         self.llm_config = llm_config
         self.verbose = verbose
 
-    def set_agents(self, agents: Network):
+    def set_agents(self, agents: llmn.Network):
         """
         Set the agents in the monitor
 
@@ -72,12 +81,17 @@ if __name__ == "__main__":
     theme = ["'Big Data' is only an empty buzz word.", "I hate 'Big Data'."]
 
     # Create a network of agents from files
-    net = Network()
+    net = llmn.Network()
     net.add_agents("../sample_data/example_agents.json")
     g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
     net.set_network(g)
 
     # run the simulation
-    sim = LLMOpinionSimulator(llm_config, verbose=False, save_agents_debates=True)
+    sim = LLMOpinionSimulator(
+        llm_config,
+        verbose=False,
+        save_agents_debates=True,
+        monitor_type="MonitorBoundedConfidence",
+    )
     sim.set_agents(net)
     sim.run(n_iterations=10, themes=theme, output_file="../sample_data/results.jsonl")

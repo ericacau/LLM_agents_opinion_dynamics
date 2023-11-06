@@ -31,7 +31,7 @@ class Network(object):
         with open(filename, "r") as f:
             data = json.load(f)
             for elem in data:
-                agent = Agent(elem["name"], status=elem["status"])
+                agent = Agent(**elem)
                 self.agents.add_agent(agent)
 
     def get_agents(self) -> Agents:
