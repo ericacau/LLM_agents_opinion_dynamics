@@ -65,7 +65,7 @@ class Monitor(object):
                 yield {
                     "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
-                    "opinion_variation": original_status - new_status,
+                    "opinion_variation": new_status - original_status,
                 }
 
     def iteration_bunch(self, n: int, themes: object) -> object:
@@ -120,8 +120,8 @@ class Monitor(object):
             - Your arguments should be as convincing as possible and MUST support an opinion of {agent_2.get_status()} for the proposed topic.
                 
             Constraints:
-            - Do not disclose for any reason your opinion.
-            - Stick to your initial opinion.
+            - Do not disclose for any reason the numeric value of your opinion in your arguments.
+            - Stick to your initial opinion while presenting your arguments.
             - You cannot change your opinion while trying to persuade {agent_1.name}.""",
             llm_config=self.llm_config,
             max_consecutive_auto_reply=1,

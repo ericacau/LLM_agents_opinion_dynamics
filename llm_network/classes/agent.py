@@ -4,11 +4,11 @@ import random
 class Agent(object):
     def __init__(self, name: str, status: int = None, **kwargs):
         """
-        Initialize the Profile object.
+        Initialize the Agent object.
 
-        :param name: The name of the profile.
-        :param age: The age of the profile.
-        :param gender: The gender of the profile.
+        :param name:
+        :param status:
+        :param kwargs:
         """
         self.name = name
         self.profile = kwargs
