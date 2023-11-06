@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__author__ = "PackageOwner"
+__author__ = "Giulio Rossetti"
 __license__ = "BSD-2-Clause"
-__email__ = "email"
+__email__ = "giulio.rossetti@gmail.com"
 
 
 here = path.abspath(path.dirname(__file__))
@@ -21,10 +21,10 @@ setup(
     name="package_name",
     version="0.0.1",
     license="BSD-Clause-2",
-    description="Package description",
-    url="https://github.com/USERNAME/project",
-    author="Author Name",
-    author_email="email",
+    description="Opinion Dynamics Simulator for LLM agents",
+    url="https://github.com/giuliorossetti/project",
+    author="Giulio Rossetti",
+    author_email="giulio.rossetti@gmail.com",
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -43,7 +43,7 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
     ],
-    keywords="keyword1 keyword2 keyword3",
+    keywords="opinion-dynamics llm simulation",
     install_requires=requirements,
     long_description=long_description,
     long_description_content_type="text/markdown",
