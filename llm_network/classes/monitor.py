@@ -6,7 +6,7 @@ import tqdm
 
 class Monitor(object):
     def __init__(
-        self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False
+        self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False, **kwargs
     ):
         """
         LLM Opinion Simulator
@@ -14,12 +14,14 @@ class Monitor(object):
         :param llm_config: endpoint configuration
         :param verbose: whether to print or not the LLM output
         :param save_agents_debates: whether to save the debates of the agents
+        :param kwargs: additional arguments to be passed to the monitor
         """
         self.agents = None
         self.statuses = {}
         self.llm_config = llm_config
         self.verbose = verbose
         self.save_agents_debates = save_agents_debates
+        self.args = kwargs
 
     def get_statuses(self) -> dict:
         """
