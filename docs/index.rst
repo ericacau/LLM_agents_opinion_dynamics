@@ -14,7 +14,7 @@ If you would like to test ``PackageName`` functionalities without installing it 
 
 ================ =================== ==================  ==========  ===============
    **Date**      **Python Versions**   **Main Author**   **GitHub**      **pypl**
-|date|                 3.8-3.9       `Author 1`_         `Source`_   `Distribution`_
+|date|                 3.10          `Giulio Rossetti`_  `Source`_   `Distribution`_
 ================ =================== ==================  ==========  ===============
 
 
@@ -24,7 +24,7 @@ PackageName Dev Team
 
 ======================= ============================
 **Name**                **Contribution**
-`Author 1`_             Library Design/Documentation
+`Giulio Rossetti`_      Library Design/Documentation
 ======================= ============================
 
 
@@ -38,7 +38,7 @@ PackageName Dev Team
 
 
 
-.. _`Author 1`: http://personal_website.net
-.. _`Source`: https://github.com/USERNAME/project
+.. _`Giulio Rossetti`: http://giuliorossetti.github.io
+.. _`Source`: https://github.com/giuliorossetti/LLM_Opinion_Dynamics
 .. _`Distribution`: https://pypi.python.org/pypi/package_name
 .. _`SoBigData++`: https://sobigdata.d4science.org/group/sobigdata-gateway/explore?siteId=20371853

@@ -33,6 +33,10 @@ MOCK_MODULES = [
     "matplotlib",
     "numpy",
     "scipy",
+    "pyautogen",
+    "autogen",
+    "networkx",
+    "tqdm"
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
@@ -81,8 +85,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "Package Name"
-copyright = "2018, Package Author"
-author = "Package Author"
+copyright = "2023, Giulio Rossetti"
+author = "Giulio Rossetti"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

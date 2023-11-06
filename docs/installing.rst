@@ -23,7 +23,7 @@ You can install the development version with
 
 .. code-block:: python
 
-    pip install git+https://github.com/USERNAME/project.git
+    pip install git+https://github.com/giuliorossetti/LLM_Opinion_Dynamics.git
 
 
 Alternatively, you can install using conda:
@@ -81,7 +81,7 @@ Clone the ``PackageName`` repostitory (see GitHub_ for options)
 
 .. code-block:: python
 
-    git clone https://github.com/USERNAME/project.git
+    git clone https://github.com/giuliorossetti/LLM_Opinion_Dynamics.git
 
 Change directory to project
 
