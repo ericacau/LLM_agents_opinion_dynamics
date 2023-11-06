@@ -9,7 +9,9 @@ class Monitor(object):
         self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False, **kwargs
     ):
         """
-        LLM Opinion Simulator
+        LLM Opinion Simulator Monitor.
+        The monitor handles how interacting agents are selected and how the debate is run.
+        Only the agent starting the debate is allowed to change his opinion.
 
         :param llm_config: endpoint configuration
         :param verbose: whether to print or not the LLM output
@@ -44,7 +46,8 @@ class Monitor(object):
 
     def iteration(self, theme: str) -> object:
         """
-        Run an iteration of the simulation
+        Run an iteration of the simulation.
+        Agents are selected randomly.
 
         :param theme: theme to be discussed
         :return: a dictionary with the results of the iteration
@@ -70,7 +73,7 @@ class Monitor(object):
                     "opinion_variation": new_status - original_status,
                 }
 
-    def iteration_bunch(self, n: int, themes: object) -> object:
+    def iteration_bunch(self, n: int, themes: list) -> object:
         """
         Run a bunch of iterations
 
@@ -98,7 +101,8 @@ class Monitor(object):
             llm_config=self.llm_config,
             system_message=f"""Agent {agent_1.name}: 
             You are a human being allowed to have his own opinions.
-            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", your initial opinion toward the proposed discussion topic is {agent_1.get_status()}.
+            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
+            your initial opinion toward the proposed discussion topic is {agent_1.get_status()}.
             
             Task:
             - Listen to the opinions of {agent_2.name} on the topic discussed and, if convinced, update your own. 
@@ -106,7 +110,8 @@ class Monitor(object):
             - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed).
             
             Constraints:
-            - At the end of each interaction write the value of your updated opinion in the following format: "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
+            - At the end of each interaction write the value of your updated opinion in the following format: 
+              "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
             """,
             max_consecutive_auto_reply=1,
         )
@@ -115,11 +120,13 @@ class Monitor(object):
             name=f"{agent_2.name}",
             system_message=f"""Agent {agent_2.name}.
             You are a human being allowed to have his own opinions.
-            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", your initial opinion on the proposed topic is {agent_2.get_status()}.
+            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
+            your initial opinion on the proposed topic is {agent_2.get_status()}.
             
             Task:
             - Support your opinion by providing arguments.
-            - Your arguments should be as convincing as possible and MUST support an opinion of {agent_2.get_status()} for the proposed topic.
+            - Your arguments should be as convincing as possible and MUST support an opinion of {agent_2.get_status()} 
+              for the proposed topic.
                 
             Constraints:
             - Do not disclose for any reason the numeric value of your opinion in your arguments.

@@ -141,11 +141,11 @@ class Agents(object):
         """
         return random.choice(list(self.agents.values()))
 
-    def agents_iter(self) -> object:
+    def agents_iter(self) -> (str, Agent):
         """
         Iterate over the agents
 
-        :return: an iterator over the agents
+        :return: an iterator over (name, Agent) pairs
         """
         for k, v in self.agents.items():
             yield k, v

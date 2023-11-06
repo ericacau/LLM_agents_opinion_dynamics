@@ -5,7 +5,8 @@ import random
 class MonitorBoundedConfidence(Monitor):
     def iteration(self, theme: str) -> object:
         """
-        Run an iteration of the simulation
+        Run an iteration of the simulation.
+        Agents are selected randomly, but only those whose current status is within the epsilon range are considered.
 
         :param theme: theme to be discussed
         :return: a dictionary with the results of the iteration
