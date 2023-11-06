@@ -6,7 +6,12 @@ import tqdm
 
 class Monitor(object):
     def __init__(
-        self, llm_config: dict, verbose: bool = False, save_agents_debates: bool = False, **kwargs
+        self,
+        llm_config: dict,
+        verbose: bool = False,
+        save_agents_debates: bool = False,
+        agents_instruction: dict = None,
+        **kwargs,
     ):
         """
         LLM Opinion Simulator Monitor.
@@ -16,6 +21,7 @@ class Monitor(object):
         :param llm_config: endpoint configuration
         :param verbose: whether to print or not the LLM output
         :param save_agents_debates: whether to save the debates of the agents
+        :param agents_instruction: a dictionary with the instructions for each agent (key: discussant|opponent, value: instruction)
         :param kwargs: additional arguments to be passed to the monitor
         """
         self.agents = None
@@ -23,6 +29,7 @@ class Monitor(object):
         self.llm_config = llm_config
         self.verbose = verbose
         self.save_agents_debates = save_agents_debates
+        self.agents_instruction = agents_instruction
         self.args = kwargs
 
     def get_statuses(self) -> dict:
@@ -87,54 +94,76 @@ class Monitor(object):
             else:
                 yield self.iteration(themes[i % len(themes)])
 
-    def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (int, str):
+    def debate(self, discussant: Agent, opponent: Agent, theme: str) -> (int, str):
         """
         Run a debate between two agents
 
-        :param agent_1:
-        :param agent_2:
-        :param theme:
-        :return:
+        :param discussant: the agent starting the debate
+        :param opponent: the agent receiving the debate
+        :param theme: the theme to be discussed
+        :return: the new status of the discussant and the text of the debate
         """
-        u1 = AssistantAgent(
-            name=f"{agent_1.name}",
-            llm_config=self.llm_config,
-            system_message=f"""Agent {agent_1.name}: 
-            You are a human being allowed to have his own opinions.
-            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
-            your initial opinion toward the proposed discussion topic is {agent_1.get_status()}.
-            
-            Task:
-            - Listen to the opinions of {agent_2.name} on the topic discussed and, if convinced, update your own. 
-            - You can always maintain your initial opinion if {agent_2.name} message is shallow.
-            - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed).
-            
-            Constraints:
-            - At the end of each interaction write the value of your updated opinion in the following format: 
-              "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
-            """,
-            max_consecutive_auto_reply=1,
-        )
 
-        u2 = AssistantAgent(
-            name=f"{agent_2.name}",
-            system_message=f"""Agent {agent_2.name}.
-            You are a human being allowed to have his own opinions.
-            In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
-            your initial opinion on the proposed topic is {agent_2.get_status()}.
-            
-            Task:
-            - Support your opinion by providing arguments.
-            - Your arguments should be as convincing as possible and MUST support an opinion of {agent_2.get_status()} 
-              for the proposed topic.
+        if self.agents_instruction is None:
+            u1 = AssistantAgent(
+                name=f"{discussant.name}",
+                llm_config=self.llm_config,
+                system_message=f"""Agent {discussant.name}: 
+                You are a human being allowed to have his own opinions.
+                In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
+                your initial opinion toward the proposed discussion topic is {discussant.get_status()}.
                 
-            Constraints:
-            - Do not disclose for any reason the numeric value of your opinion in your arguments.
-            - Stick to your initial opinion while presenting your arguments.
-            - You cannot change your opinion while trying to persuade {agent_1.name}.""",
-            llm_config=self.llm_config,
-            max_consecutive_auto_reply=1,
-        )
+                Task:
+                - Listen to the opinions of {opponent.name} on the topic discussed and, if convinced, update your own. 
+                - You can always maintain your initial opinion if {opponent.name} message is shallow.
+                - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed).
+                
+                Constraints:
+                - At the end of each interaction write the value of your updated opinion in the following format: 
+                  "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
+                """,
+                max_consecutive_auto_reply=1,
+            )
+
+            u2 = AssistantAgent(
+                name=f"{opponent.name}",
+                system_message=f"""Agent {opponent.name}.
+                You are a human being allowed to have his own opinions.
+                In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
+                your initial opinion on the proposed topic is {opponent.get_status()}.
+                
+                Task:
+                - Support your opinion by providing arguments.
+                - Your arguments should be as convincing as possible and MUST support an opinion of {opponent.get_status()} 
+                  for the proposed topic.
+                    
+                Constraints:
+                - Do not disclose for any reason the numeric value of your opinion in your arguments.
+                - Stick to your initial opinion while presenting your arguments.
+                - You cannot change your opinion while trying to persuade {discussant.name}.""",
+                llm_config=self.llm_config,
+                max_consecutive_auto_reply=1,
+            )
+
+        else:
+
+            u1_instruction = self.agents_instruction["discussant"].format(**locals())
+
+            u1 = AssistantAgent(
+                name=f"{discussant.name}",
+                llm_config=self.llm_config,
+                system_message=u1_instruction,
+                max_consecutive_auto_reply=1,
+            )
+
+            u2_instruction = self.agents_instruction["opponent"].format(**locals())
+
+            u2 = AssistantAgent(
+                name=f"{opponent.name}",
+                system_message=u2_instruction,
+                llm_config=self.llm_config,
+                max_consecutive_auto_reply=1,
+            )
 
         u1.initiate_chat(
             u2,
@@ -154,4 +183,4 @@ class Monitor(object):
         if len(nb) > 0:
             return int(nb[-1]), text
         else:
-            return agent_1.get_status(), text
+            return discussant.get_status(), text

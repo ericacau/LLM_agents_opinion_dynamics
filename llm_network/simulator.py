@@ -2,7 +2,6 @@ import networkx as nx
 
 import llm_network.classes as llmn
 import json
-import sys
 
 
 class LLMOpinionSimulator(object):
@@ -12,6 +11,7 @@ class LLMOpinionSimulator(object):
         verbose: bool = False,
         save_agents_debates: bool = False,
         monitor_type: str = "Monitor",
+        agents_instruction: dict = None,
     ):
         """
         LLM Opinion Simulator
@@ -20,12 +20,13 @@ class LLMOpinionSimulator(object):
         :param verbose: whether to print or not the LLM output
         :param save_agents_debates: whether to save the debates of the agents
         :param monitor_type: type of monitor to be used (e.g., Monitor, MonitorBoundedConfidence)
+        :param agents_instruction: a dictionary with the instructions for each agent (key: discussant|opponent, value: instruction)
         """
 
         monitor = getattr(llmn, monitor_type)
 
         self.monitor = monitor(
-            llm_config, verbose=False, save_agents_debates=save_agents_debates
+            llm_config, verbose=False, save_agents_debates=save_agents_debates, agents_instruction=agents_instruction
         )
         self.statuses = {}
         self.llm_config = llm_config
@@ -78,7 +79,7 @@ if __name__ == "__main__":
         "request_timeout": 1200,
     }
 
-    theme = ["'Big Data' is only an empty buzz word.", "I hate 'Big Data'."]
+    theme = ["Clowns are creepy and should be banned from circuses"]
 
     # Create a network of agents from files
     net = llmn.Network()
@@ -86,12 +87,16 @@ if __name__ == "__main__":
     g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
     net.set_network(g)
 
+    # Create a dictionary with the instructions for each agent (not mandatory)
+    instructions = json.load(open("../sample_data/agents_instructions.json"))
+
     # run the simulation
     sim = LLMOpinionSimulator(
         llm_config,
         verbose=False,
         save_agents_debates=True,
         monitor_type="MonitorBoundedConfidence",
+        agents_instruction=instructions,
     )
     sim.set_agents(net)
     sim.run(n_iterations=10, themes=theme, output_file="../sample_data/results.jsonl")
