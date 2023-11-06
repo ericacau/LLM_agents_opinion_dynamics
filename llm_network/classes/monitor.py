@@ -146,7 +146,6 @@ class Monitor(object):
             )
 
         else:
-
             u1_instruction = self.agents_instruction["discussant"].format(**locals())
 
             u1 = AssistantAgent(

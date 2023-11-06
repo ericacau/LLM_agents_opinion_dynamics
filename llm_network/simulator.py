@@ -26,7 +26,10 @@ class LLMOpinionSimulator(object):
         monitor = getattr(llmn, monitor_type)
 
         self.monitor = monitor(
-            llm_config, verbose=False, save_agents_debates=save_agents_debates, agents_instruction=agents_instruction
+            llm_config,
+            verbose=False,
+            save_agents_debates=save_agents_debates,
+            agents_instruction=agents_instruction,
         )
         self.statuses = {}
         self.llm_config = llm_config
