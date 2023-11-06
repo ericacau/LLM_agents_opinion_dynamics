@@ -69,7 +69,7 @@ if __name__ == "__main__":
         "request_timeout": 1200,
     }
 
-    theme = "'Big Data' is only an empty buzz word."
+    theme = ["'Big Data' is only an empty buzz word.", "I hate 'Big Data'."]
 
     # Create a network of agents from files
     net = Network()

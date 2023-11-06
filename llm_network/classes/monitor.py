@@ -80,7 +80,7 @@ class Monitor(object):
             if isinstance(themes, str):
                 yield self.iteration(themes)
             else:
-                yield self.iteration(themes[i])
+                yield self.iteration(themes[i%len(themes)])
 
     def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (int, str):
         """
