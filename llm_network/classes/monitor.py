@@ -58,7 +58,7 @@ class Monitor(object):
                 yield {
                     "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
-                    "opinion_variation": original_status - new_status,
+                    "opinion_variation": new_status - original_status,
                     "opponent_statement": text,
                 }
             else:
@@ -82,7 +82,7 @@ class Monitor(object):
             else:
                 yield self.iteration(themes[i])
 
-    def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (float, str):
+    def debate(self, agent_1: Agent, agent_2: Agent, theme: str) -> (int, str):
         """
         Run a debate between two agents
 
