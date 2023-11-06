@@ -73,11 +73,11 @@ if __name__ == "__main__":
 
     # Create a network of agents from files
     net = Network()
-    net.add_agents("example_agents.json")
-    g = nx.read_edgelist("example_net.csv", delimiter=",", nodetype=str)
+    net.add_agents("../sample_data/example_agents.json")
+    g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
     net.set_network(g)
 
     # run the simulation
     sim = LLMOpinionSimulator(llm_config, verbose=False, save_agents_debates=True)
     sim.set_agents(net)
-    sim.run(n_iterations=10, themes=theme, output_file="results.jsonl")
+    sim.run(n_iterations=10, themes=theme, output_file="../sample_data/results.jsonl")

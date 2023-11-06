@@ -1,6 +1,6 @@
 name: package_name
 dependencies:
-- python>=3.8
-- numpy
-- scikit-learn
-- scipy
+- python>=3.10
+- networkx>=3.0
+- pyautogen
+- tqdm

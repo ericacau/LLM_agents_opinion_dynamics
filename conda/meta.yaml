@@ -10,30 +10,31 @@ source:
 
 requirements:
   host:
-    - numpy
     - pip
-    - python>=3.8
-    - scikit-learn
-    - scipy
+    - python>=3.10
     - setuptools
+    - networkx>=3.10
+    - tqdm
+    - pyautogen
   build:
     - python
     - setuptools
   run:
     - numpy
-    - python>=3.8
-    - scikit-learn
-    - scipy
+    - python>=3.10
+    - networkx>=3.10
+    - tqdm
+    - pyautogen
 
 about:
-  home: "https://github.com/USERNAME/project"
+  home: "https://github.com/giuliorossetti/LLM_Network"
   license: "BSD"
   license_family: "BSD"
   license_file: ""
-  summary: "Description of the package"
-  doc_url: "https://package_name.readthedocs.io/"
-  dev_url: "https://github.com/USERNAME/project"
+  summary: "Opinion Dynamic simulation with networked LLM agents"
+  doc_url: "https://llm_network.readthedocs.io/"
+  dev_url: "https://github.com/giuliorossetti/llm_network"
 
 extra:
   recipe-maintainers:
-    - PackageOwner
+    - GiulioRossetti
