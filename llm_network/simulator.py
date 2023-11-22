@@ -69,8 +69,8 @@ if __name__ == "__main__":
     # Create a configuration
     config_list = [
         {
-            "model": "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-            "api_base": "http://127.0.0.1:8000/v1",
+            "model": "mistral-7bclear-instruct-v0.1.Q4_K_M.gguf",
+            "api_base": "http://10.8.0.0:8000/v1",
             "api_type": "open_ai",
             "api_key": "NULL",
         }
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         "request_timeout": 1200,
     }
 
-    theme = ["Clowns are creepy and should be banned from circuses"]
+    theme = ["Disinformation is a crucial problem for democracy"]
 
     # Create a network of agents from files
     net = llmn.Network()
