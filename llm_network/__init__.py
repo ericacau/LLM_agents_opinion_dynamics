@@ -1,1 +1,1 @@
-
+from simulator import LLMOpinionSimulator
