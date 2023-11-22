@@ -62,7 +62,7 @@ class Monitor(object):
         :param theme: theme to be discussed
         :return: a dictionary with the results of the iteration
         """
-        for n1, agent_1 in self.agents.agents_iter():
+        for n1, agent_1 in tqdm.tqdm(list(self.agents.agents_iter())):
             if self.meanfield:
                 agent_2 = self.agents.get_random_agent()
             else:

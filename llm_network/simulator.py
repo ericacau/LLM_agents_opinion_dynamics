@@ -80,6 +80,7 @@ if __name__ == "__main__":
         "config_list": config_list,
         "seed": 42,
         "request_timeout": 1200,
+        "max_tokens": 200,  # max response length
     }
 
     theme = ["Disinformation is a crucial problem for democracy"]
