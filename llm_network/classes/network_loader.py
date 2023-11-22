@@ -4,12 +4,13 @@ import networkx as nx
 
 
 class Network(object):
-    def __init__(self):
+    def __init__(self, meanfield=True):
         """
         Initialize the network.
         """
         self.agents = Agents()
         self.g = None
+        self.meanfield = meanfield
 
     def set_network(self, g: nx.Graph):
         """
@@ -18,6 +19,7 @@ class Network(object):
         :param g: a networkx graph
         """
         self.g = g
+        self.meanfield = False
         for _, agent in self.agents.agents_iter():
             neighbors = [self.agents.get_agent(n) for n in self.g.neighbors(agent.name)]
             agent.add_neighbors(neighbors)

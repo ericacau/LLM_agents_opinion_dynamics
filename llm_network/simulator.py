@@ -35,13 +35,13 @@ class LLMOpinionSimulator(object):
         self.llm_config = llm_config
         self.verbose = verbose
 
-    def set_agents(self, agents: llmn.Network):
+    def set_agents(self, network: llmn.Network):
         """
         Set the agents in the monitor
 
-        :param agents: network of agents
+        :param network: network of agents
         """
-        self.monitor.set_agents(agents.get_agents())
+        self.monitor.set_agents(network)
 
     def run(
         self, n_iterations: int, themes: object, output_file: str = "results.jsonl"
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     config_list = [
         {
             "model": "mistral-7bclear-instruct-v0.1.Q4_K_M.gguf",
-            "api_base": "http://10.8.0.0:8000/v1",
+            "api_base": "http://localhost:8000/v1",
             "api_type": "open_ai",
             "api_key": "NULL",
         }
@@ -86,9 +86,9 @@ if __name__ == "__main__":
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents("../sample_data/example_agents.json")
-    g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
-    net.set_network(g)
+    net.add_agents("../agents.json") # "../sample_data/example_agents.json"
+    #g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
+    #net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
     instructions = json.load(open("../sample_data/agents_instructions.json"))
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         llm_config,
         verbose=False,
         save_agents_debates=True,
-        monitor_type="MonitorBoundedConfidence",
+        monitor_type="Monitor", #"MonitorBoundedConfidence",
         agents_instruction=instructions,
     )
     sim.set_agents(net)

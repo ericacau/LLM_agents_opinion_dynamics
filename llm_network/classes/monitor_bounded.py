@@ -12,13 +12,23 @@ class MonitorBoundedConfidence(Monitor):
         :return: a dictionary with the results of the iteration
         """
         for n1, agent_1 in self.agents.agents_iter():
-            agents = [
-                x
-                for x in agent_1.get_neighbors()
-                if max([1, (agent_1.status - agent_1.args["epsilon"])])
-                <= x.status
-                <= min([10, (agent_1.status + agent_1.args["epsilon"])])
-            ]
+
+            if self.meanfield:
+                agents = [
+                    x
+                    for x in self.agents.agents.values()
+                    if max([1, (agent_1.status - agent_1.args["epsilon"])])
+                       <= x.status
+                       <= min([10, (agent_1.status + agent_1.args["epsilon"])])
+                ]
+            else:
+                agents = [
+                    x
+                    for x in agent_1.get_neighbors()
+                    if max([1, (agent_1.status - agent_1.args["epsilon"])])
+                    <= x.status
+                    <= min([10, (agent_1.status + agent_1.args["epsilon"])])
+                ]
 
             if len(agents) == 0:
                 continue

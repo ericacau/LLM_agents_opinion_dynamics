@@ -1,4 +1,5 @@
 from .agent import Agent, Agents
+from .network_loader import Network
 from autogen import AssistantAgent
 import re
 import tqdm
@@ -31,6 +32,7 @@ class Monitor(object):
         self.save_agents_debates = save_agents_debates
         self.agents_instruction = agents_instruction
         self.args = kwargs
+        self.meanfield = True
 
     def get_statuses(self) -> dict:
         """
@@ -40,14 +42,15 @@ class Monitor(object):
         """
         return self.statuses
 
-    def set_agents(self, agents: Agents):
+    def set_agents(self, network: Network):
         """
         Set the agents in the monitor
 
-        :param agents: a list of Agent objects
+        :param network: the networks of agents
         :return:
         """
-        self.agents = agents
+        self.agents = network.get_agents()
+        self.meanfield = network.meanfield
         for name, agent in self.agents.agents_iter():
             self.statuses[name] = agent.get_status()
 
@@ -60,7 +63,10 @@ class Monitor(object):
         :return: a dictionary with the results of the iteration
         """
         for n1, agent_1 in self.agents.agents_iter():
-            agent_2 = agent_1.get_random_neighbor()
+            if self.meanfield:
+                agent_2 = self.agents.get_random_agent()
+            else:
+                agent_2 = agent_1.get_random_neighbor()
             new_status, text = self.debate(agent_1, agent_2, theme)
 
             original_status = self.statuses[n1]
