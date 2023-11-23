@@ -1,4 +1,4 @@
-from .agent import Agent, Agents
+from .agent import Agent
 from .network_loader import Network
 from autogen import AssistantAgent
 import re
@@ -74,16 +74,16 @@ class Monitor(object):
             agent_1.set_status(new_status)
             if self.save_agents_debates:
                 yield {
-                    "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
                     "opinion_variation": new_status - original_status,
                     "opponent_statement": text,
+                    "status": {**self.statuses},
                 }
             else:
                 yield {
-                    "status": {**self.statuses},
                     "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
                     "opinion_variation": new_status - original_status,
+                    "status": {**self.statuses},
                 }
 
     def iteration_bunch(self, n: int, themes: list) -> object:
@@ -186,6 +186,8 @@ class Monitor(object):
         nb = re.findall(r"[0-9]+", final_text)
 
         if len(nb) > 0:
-            return int(nb[-1]), text
-        else:
-            return discussant.get_status(), text
+            new_op = int(nb[-1])
+            if 1 <= new_op <= 10:
+                return new_op, text
+
+        return discussant.get_status(), text

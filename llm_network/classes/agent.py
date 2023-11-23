@@ -1,4 +1,4 @@
-import random
+import numpy as np
 
 
 class Agent(object):
@@ -80,7 +80,7 @@ class Agent(object):
 
         :return: an Agent object
         """
-        return random.choice(list(self.neighbors.values()))
+        return np.random.choice(list(self.neighbors.values()))
 
     def get_neighbors(self) -> list:
         """
@@ -113,7 +113,12 @@ class Agents(object):
 
         :param agent: an Agent object
         """
-        self.agents[agent.name] = agent
+        try:
+            aid = f"a{int(agent.name)}"
+        except ValueError:
+            aid = agent.name
+
+        self.agents[aid] = agent
 
     def get_agent(self, name: str) -> object:
         """
@@ -139,7 +144,10 @@ class Agents(object):
 
         :return: an Agent object
         """
-        return random.choice(list(self.agents.values()))
+        n_agents = len(self.agents)
+        ag = np.random.randint(0, n_agents)
+
+        return self.agents[f"a{ag}"]
 
     def agents_iter(self) -> (str, Agent):
         """

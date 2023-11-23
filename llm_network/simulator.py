@@ -80,27 +80,27 @@ if __name__ == "__main__":
         "config_list": config_list,
         "seed": 42,
         "request_timeout": 1200,
-        "max_tokens": 200,  # max response length
+        "max_tokens": -1  # max response length, -1 no limits. Imposing limits may lead to truncated responses
     }
 
-    theme = ["Disinformation is a crucial problem for democracy"]
+    theme = ["A strong legislation is needed to reduce gun violence"]
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents("../agents.json") # "../sample_data/example_agents.json"
-    #g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
-    #net.set_network(g)
+    net.add_agents("../agents2.json") # "../sample_data/example_agents.json"
+    # g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
+    # net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
-    instructions = json.load(open("../sample_data/agents_instructions.json"))
+    instructions = json.load(open("../sample_data/agents_instructions_theory_of_mind.json"))  # "../sample_data/agents_instructions.json"
 
     # run the simulation
     sim = LLMOpinionSimulator(
         llm_config,
         verbose=False,
         save_agents_debates=True,
-        monitor_type="Monitor", #"MonitorBoundedConfidence",
+        monitor_type= "MonitorTheoryOfMind", # "Monitor",  # "MonitorBoundedConfidence",
         agents_instruction=instructions,
     )
     sim.set_agents(net)
-    sim.run(n_iterations=10, themes=theme, output_file="../sample_data/results.jsonl")
+    sim.run(n_iterations=1, themes=theme, output_file="../sample_data/results_theory_of_mind.jsonl")
