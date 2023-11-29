@@ -143,7 +143,7 @@ class MonitorTheoryOfMind(Monitor):
 
         if len(nb) > 0:
             new_op = int(nb[-1])
-            if 1 <= new_op <= 10:
+            if new_op in [1, 2, 3]:
                 return new_op, text
 
         return None, text
