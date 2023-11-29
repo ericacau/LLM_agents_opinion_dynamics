@@ -12,14 +12,13 @@ class MonitorBoundedConfidence(Monitor):
         :return: a dictionary with the results of the iteration
         """
         for n1, agent_1 in self.agents.agents_iter():
-
             if self.meanfield:
                 agents = [
                     x
                     for x in self.agents.agents.values()
                     if max([1, (agent_1.status - agent_1.args["epsilon"])])
-                       <= x.status
-                       <= min([10, (agent_1.status + agent_1.args["epsilon"])])
+                    <= x.status
+                    <= min([10, (agent_1.status + agent_1.args["epsilon"])])
                 ]
             else:
                 agents = [
@@ -36,6 +35,8 @@ class MonitorBoundedConfidence(Monitor):
             agent_2 = random.choice(agents)
 
             new_status, text = self.debate(agent_1, agent_2, theme)
+            if new_status is None:
+                new_status = self.statuses[n1]
 
             original_status = self.statuses[n1]
             self.statuses[n1] = new_status

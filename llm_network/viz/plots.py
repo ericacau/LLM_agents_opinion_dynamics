@@ -1,10 +1,11 @@
-#%%
+# %%
 
 import matplotlib.pyplot as plt
 import numpy as np
 import json
 
-#%%
+
+# %%
 def plot_3d(x, y, Z, ax):
     """
     Plot a 3d surface
@@ -33,7 +34,8 @@ def row_normalization(Z):
     """
     return Z / Z.sum(axis=1, keepdims=True)
 
-#%%
+
+# %%
 
 x = range(1, 11)
 y = range(1, 11)
@@ -44,13 +46,12 @@ with open("../../sample_data/results_theory_of_mind.jsonl") as f:
     f.readline()
     for line in f:
         data = json.loads(line)
-        Z[data["actual_status"]-1, data["estimated_status"]-1] += 1
+        Z[data["actual_status"] - 1, data["estimated_status"] - 1] += 1
 
 
-
-ax = plt.axes(projection='3d')
+ax = plt.axes(projection="3d")
 plot_3d(x, y, Z, ax)
 
 plt.show()
 
-#%%
+# %%

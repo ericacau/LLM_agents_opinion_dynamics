@@ -12,6 +12,8 @@ class Monitor(object):
         verbose: bool = False,
         save_agents_debates: bool = False,
         agents_instruction: dict = None,
+        min_opinion: int = 1,
+        max_opinion: int = 10,
         **kwargs,
     ):
         """
@@ -33,6 +35,8 @@ class Monitor(object):
         self.agents_instruction = agents_instruction
         self.args = kwargs
         self.meanfield = True
+        self.min_opinion = min_opinion
+        self.max_opinion = max_opinion
 
     def get_statuses(self) -> dict:
         """
@@ -68,20 +72,30 @@ class Monitor(object):
             else:
                 agent_2 = agent_1.get_random_neighbor()
             new_status, text = self.debate(agent_1, agent_2, theme)
+            if new_status is None:
+                new_status = self.statuses[n1]
 
             original_status = self.statuses[n1]
             self.statuses[n1] = new_status
             agent_1.set_status(new_status)
             if self.save_agents_debates:
                 yield {
-                    "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                    "interacting_agents": {
+                        "discussant": n1,
+                        "opponent": agent_2.name,
+                        "opponent_opinion": self.statuses[agent_2.name],
+                    },
                     "opinion_variation": new_status - original_status,
                     "opponent_statement": text,
                     "status": {**self.statuses},
                 }
             else:
                 yield {
-                    "interacting_agents": {"discussant": n1, "opponent": agent_2.name},
+                    "interacting_agents": {
+                        "discussant": n1,
+                        "opponent": agent_2.name,
+                        "opponent_opinion": self.statuses[agent_2.name],
+                    },
                     "opinion_variation": new_status - original_status,
                     "status": {**self.statuses},
                 }
@@ -110,23 +124,30 @@ class Monitor(object):
         :return: the new status of the discussant and the text of the debate
         """
 
+        discussant_opinion = self.args["opinion_map"][
+            str(self.statuses[discussant.name])
+        ]
+        opponent_opinion = self.args["opinion_map"][str(self.statuses[opponent.name])]
+
         if self.agents_instruction is None:
             u1 = AssistantAgent(
                 name=f"{discussant.name}",
                 llm_config=self.llm_config,
-                system_message=f"""Agent {discussant.name}: 
+                system_message=f"""Agent {discussant.name}.
+                [INST]
                 You are a human being allowed to have his own opinions.
-                In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
-                your initial opinion toward the proposed discussion topic is {discussant.get_status()}.
+                In a scale from {self.min_opinion} to {self.max_opinion}, where {self.min_opinion} = "I fully disagree" and {self.max_opinion} = "I totally agree", 
+                your initial opinion toward the proposed discussion topic is {self.statuses[discussant.name]}.
                 
                 Task:
                 - Listen to the opinions of {opponent.name} on the topic discussed and, if convinced, update your own. 
                 - You can always maintain your initial opinion if {opponent.name} message is shallow.
-                - Do not drastically change your opinion (e.g., 1 to 10 or 10 to 1 are not allowed).
+                - Do not drastically change your opinion (e.g., {self.min_opinion} to {self.max_opinion} or {self.max_opinion} to {self.min_opinion} are not allowed).
                 
                 Constraints:
                 - At the end of each interaction write the value of your updated opinion in the following format: 
-                  "My opinion is X", where X is an integer between 1 and 10. No additional text is allowed.
+                  "My opinion is X", where X is an integer between {self.min_opinion} and {self.max_opinion}. No additional text is allowed.
+                [/INST]
                 """,
                 max_consecutive_auto_reply=1,
             )
@@ -134,19 +155,19 @@ class Monitor(object):
             u2 = AssistantAgent(
                 name=f"{opponent.name}",
                 system_message=f"""Agent {opponent.name}.
-                You are a human being allowed to have his own opinions.
-                In a scale from 1 to 10, where 1 = "I fully disagree" and 10 = "I totally agree", 
-                your initial opinion on the proposed topic is {opponent.get_status()}.
+                [INST]
+                In a scale from {self.min_opinion} to {self.max_opinion}, where {self.min_opinion} = "I fully disagree" and {self.max_opinion} = "I totally agree", 
+                your initial opinion on the proposed topic is {self.statuses[opponent.name]}.
                 
                 Task:
                 - Support your opinion by providing arguments.
-                - Your arguments should be as convincing as possible and MUST support an opinion of {opponent.get_status()} 
+                - Your arguments should be as convincing as possible and MUST support an opinion of {self.statuses[opponent.name]} 
                   for the proposed topic.
                     
                 Constraints:
-                - Do not disclose for any reason the numeric value of your opinion in your arguments.
                 - Stick to your initial opinion while presenting your arguments.
-                - You cannot change your opinion while trying to persuade {discussant.name}.""",
+                - You cannot change your opinion while trying to persuade {discussant.name}.
+                [/INST]""",
                 llm_config=self.llm_config,
                 max_consecutive_auto_reply=1,
             )
@@ -187,7 +208,7 @@ class Monitor(object):
 
         if len(nb) > 0:
             new_op = int(nb[-1])
-            if 1 <= new_op <= 10:
+            if self.min_opinion <= new_op <= self.max_opinion:
                 return new_op, text
 
-        return discussant.get_status(), text
+        return None, text
