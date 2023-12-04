@@ -202,13 +202,27 @@ class Monitor(object):
 
         text = None
         if self.save_agents_debates:
-            text = u1.chat_messages[u2][1]["content"]
+            text = u1.chat_messages[u2][-1]["content"]
 
-        nb = re.findall(r"[0-9]+", final_text)
+        op = self.statuses[opponent.name]
+        ds = self.statuses[discussant.name]
 
-        if len(nb) > 0:
-            new_op = int(nb[-1])
-            if self.min_opinion <= new_op <= self.max_opinion:
-                return new_op, text
+        if op == ds:  # no change same opinion
+            return ds, text
 
-        return None, text
+        gt = op > ds
+        if 'NO' in text:
+            if gt:
+                new_op = max(ds - 1, self.min_opinion)
+            else:
+                new_op = min(ds + 1, self.max_opinion)
+        elif 'YES' in text:
+            if gt:
+                new_op = min(ds + 1, self.max_opinion)
+            else:
+                new_op = max(ds - 1, self.min_opinion)
+        else:
+            new_op = ds
+
+        return new_op, text
+
