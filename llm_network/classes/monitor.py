@@ -202,7 +202,7 @@ class Monitor(object):
 
         text = None
         if self.save_agents_debates:
-            text = u1.chat_messages[u2][-1]["content"]
+            text = u1.chat_messages[u2][-2]["content"]
 
         op = self.statuses[opponent.name]
         ds = self.statuses[discussant.name]
@@ -211,12 +211,12 @@ class Monitor(object):
             return ds, text
 
         gt = op > ds
-        if 'NO' in text:
+        if 'NO' in final_text:
             if gt:
                 new_op = max(ds - 1, self.min_opinion)
             else:
                 new_op = min(ds + 1, self.max_opinion)
-        elif 'YES' in text:
+        elif 'YES' in final_text:
             if gt:
                 new_op = min(ds + 1, self.max_opinion)
             else:

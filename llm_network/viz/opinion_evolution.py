@@ -57,10 +57,10 @@ class OpinionEvolution(object):
                 color = "#0000ff"
 
             plt.plot(range(0, len(opinions)), opinions, lw=1, alpha=0.5, color=color)
-            print(np.array(opinions[:4]))
-            color_dict[color] += np.array(opinions[:4])
+          #  print(np.array(opinions[:4]))
+         #   color_dict[color] += np.array(opinions[:4])
 
-        print(color_dict)
+       # print(color_dict)
 
         plt.xlabel("Iterations", fontsize=24)
         plt.ylabel("Opinion", fontsize=24)
