@@ -73,13 +73,22 @@ class Monitor(object):
                 agent_2 = self.agents.get_random_agent()
             else:
                 agent_2 = agent_1.get_random_neighbor()
-            new_status, text, discussant_text = self.debate(agent_1, agent_2, theme)
+
+            new_status, new_status_opponent, text, discussant_text, text2 = self.debate(agent_1, agent_2, theme)
             if new_status is None:
                 new_status = self.statuses[n1]
+
+            if new_status_opponent is None:
+                new_status_opponent = self.statuses[n2]
 
             original_status = self.statuses[n1]
             self.statuses[n1] = new_status
             agent_1.set_status(new_status)
+
+            original_status_opponent = self.statuses[agent_2.name]
+            self.statuses[agent_2.name] = new_status_opponent
+            agent_2.set_status(new_status_opponent)
+
             if self.save_agents_debates:
                 yield {
                     "interacting_agents": {
@@ -88,11 +97,13 @@ class Monitor(object):
                         "opponent": agent_2.name,
                         "opponent_llm": agent_2.get_llm_name(),
                         "discussant_opinion": original_status,
-                        "opponent_opinion": self.statuses[agent_2.name],
+                        "opponent_opinion": original_status_opponent,
                     },
-                    "opinion_variation": new_status - original_status,
+                    "opinion_variation_discussant": new_status - original_status,
+                    "opinion_variation_opponent": new_status_opponent - original_status_opponent,
                     "opponent_statement": text,
                     "discussant_answer": discussant_text,
+                    "opponent_answer": text2,
                     "status": {**self.statuses},
                 }
             else:
@@ -103,9 +114,10 @@ class Monitor(object):
                         "opponent": agent_2.name,
                         "opponent_llm": agent_2.get_llm_name(),
                         "discussant_opinion": original_status,
-                        "opponent_opinion": self.statuses[agent_2.name],
+                        "opponent_opinion": original_status_opponent,
                     },
-                    "opinion_variation": new_status - original_status,
+                    "opinion_variation_discussant": new_status - original_status,
+                    "opinion_variation_opponent": new_status_opponent - original_status_opponent,
                     "status": {**self.statuses},
                 }
 
@@ -203,35 +215,47 @@ class Monitor(object):
                 name=f"{opponent.name}",
                 system_message=u2_instruction,
                 llm_config=llm_conf1,#self.llm_config,
-                max_consecutive_auto_reply=1,
+                max_consecutive_auto_reply=2,
             )
 
         u1.initiate_chat(
             u2,
             message=f""" What do you think of the following statement?: "{theme}" """,
             silent=not self.verbose,  # default is False
-            max_round=3,  # default is 3
+            max_round=4,  # default is 3
         )
 
-        final_text = u1.chat_messages[u2][-1]["content"]
+        final_text_discussant = u1.chat_messages[u2][-2]["content"]
 
-        text = None
+        text1_opponent, text2_opponent = None, None
         if self.save_agents_debates:
-            text = u1.chat_messages[u2][-2]["content"]
+            text1_opponent = u1.chat_messages[u2][-3]["content"]
+            text2_opponent = u1.chat_messages[u2][-1]["content"]
+
+        u1.reset()
+        u2.reset()
 
         op = self.statuses[opponent.name]
         ds = self.statuses[discussant.name]
+        new_op_opponent = op
 
         if op == ds:  # no change same opinion
-            return ds, text, final_text
+            return ds, op, text1_opponent, final_text_discussant, text2_opponent
 
         gt = op > ds
-        if 'reject' in final_text.lower():
+        if 'reject' in final_text_discussant.lower().split():
             if gt:
                 new_op = max(ds - 1, self.min_opinion)
             else:
                 new_op = min(ds + 1, self.max_opinion)
-        elif 'accept' in final_text.lower():
+
+            if 'accept' in text2_opponent.lower().split():  # update opponent status if needed
+                if gt:
+                    new_op_opponent = max(op - 1, self.min_opinion)
+                else:
+                    new_op_opponent = min(op + 1, self.max_opinion)
+
+        elif 'accept' in final_text_discussant.lower().split():
             if gt:
                 new_op = min(ds + 1, self.max_opinion)
             else:
@@ -239,5 +263,5 @@ class Monitor(object):
         else:
             new_op = ds
 
-        return new_op, text, final_text
+        return new_op, new_op_opponent, text1_opponent, final_text_discussant, text2_opponent
 

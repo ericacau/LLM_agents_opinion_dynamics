@@ -42,7 +42,7 @@ y = range(1, 11)
 
 Z = np.zeros((len(x), len(y)))
 
-with open("../../sample_data/results_theory_of_mind.jsonl") as f:
+with open("../../results/Theseus_llama3_test1.jsonl") as f:
     f.readline()
     for line in f:
         data = json.loads(line)

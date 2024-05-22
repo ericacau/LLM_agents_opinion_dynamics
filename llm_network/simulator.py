@@ -62,7 +62,7 @@ class LLMOpinionSimulator(object):
         :param output_file: output file
         """
         with open(output_file, "w") as f:
-            initial_statuses = {"status": self.monitor.statuses}
+            initial_statuses = {"status": self.monitor.statuses, "iteration": 0}
             f.write(f"{json.dumps(initial_statuses)}\n")
             iterations = self.monitor.iteration_bunch(n_iterations, themes=themes)
 

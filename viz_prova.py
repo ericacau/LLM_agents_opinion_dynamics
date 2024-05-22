@@ -1,7 +1,8 @@
-from llm_network.viz import OpinionEvolution
+from llm_network.viz import OpinionEvolution, OpinionTrends
+
+filename = "results/Theseus_llama3.jsonl"
+
+img = OpinionTrends(filename)
+img.plot("Theseus_llama3.png")
 
 
-filename = "sample_data/results_mistral-instruct.jsonl"
-
-img = OpinionEvolution(filename)
-img.plot("viz.png")
