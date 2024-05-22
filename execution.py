@@ -13,12 +13,12 @@ if __name__ == "__main__":
             "api_key": "NULL",
         },
 
-        "mistral": {
-            "model": "mistral",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-            "api_base": "http://127.0.0.1:11434/v1",  # 8000
-            "api_type": "open_ai",
-            "api_key": "NULL",
-        }
+       # "mistral": {
+       #     "model": "mistral",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
+       #     "api_base": "http://127.0.0.1:11434/v1",  # 8000
+       #     "api_type": "open_ai",
+       #     "api_key": "NULL",
+       # }
     }
 
     llm_config = {
@@ -29,32 +29,23 @@ if __name__ == "__main__":
         "temperature": 0.9,
     }
 
-   # theme = ["Climate Change is a Hoax", "Global Warming is not real",
-   #          "Humans are not the main producers of CO2", "Climate Change is natural and normal",
-   #          "Plants and animals can adapt to climate change",
-   #          "Climate Change is good for us",
-   #          "Maybe Climate Change is real but there is nothing to be done, it's too late"]
-
     theme = ["""Theseus set sail to reclaim the throne as king of Athens. During the journey, parts of Theseus's ship began to break or decay; 
                 Theseus and his crew replaced these parts as they sailed. Eventually, each part of the ship is replaced. 
                 In the end the Ship of Theseus is still the same ship on which he originally sailed."""]
-            #["Mountains are better than the seaside", "Going to the seaside is lame",
-            # "Skying is better than swimming", "A cold winter is better than a hot summer",
-            # ]
 
     # Create a network of agents from files
     net = llmn.Network()
     net.add_agents(
-        "sample_data/agents_100_llm.json"
-    )  # "../sample_data/example_agents.json"
+        "sample_data/agents_100_llm_llama3.json"
+    )
 
     # g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
     # net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
     instructions = json.load(
-        open("sample_data/agents_instructions_no_neutral_output_v2.json")
-    )  # "../sample_data/agents_instructions_theory_of_mind.json"
+        open("sample_data/agents_instructions_Theseus.json")
+    )
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
     # run the simulation
@@ -73,5 +64,5 @@ if __name__ == "__main__":
     sim.run(
         n_iterations=1000,
         themes=theme,
-        output_file="sample_data/Theseus_llama3.jsonl",
+        output_file="results/Theseus_llama3.jsonl",
     )

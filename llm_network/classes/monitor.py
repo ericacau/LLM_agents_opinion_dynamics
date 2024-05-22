@@ -226,12 +226,12 @@ class Monitor(object):
             return ds, text, final_text
 
         gt = op > ds
-        if 'refuse' in final_text.lower():
+        if 'reject' in final_text.lower():
             if gt:
                 new_op = max(ds - 1, self.min_opinion)
             else:
                 new_op = min(ds + 1, self.max_opinion)
-        elif 'support' in final_text.lower():
+        elif 'accept' in final_text.lower():
             if gt:
                 new_op = min(ds + 1, self.max_opinion)
             else:

@@ -65,8 +65,12 @@ class LLMOpinionSimulator(object):
             initial_statuses = {"status": self.monitor.statuses}
             f.write(f"{json.dumps(initial_statuses)}\n")
             iterations = self.monitor.iteration_bunch(n_iterations, themes=themes)
+
+            it_count = 0
             for it in iterations:
+                it_count += 1
                 for i in it:
+                    i['iteration'] = it_count
                     f.write(f"{json.dumps(i)}\n")
                     f.flush()
 
