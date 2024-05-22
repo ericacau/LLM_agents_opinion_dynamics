@@ -7,14 +7,15 @@ import tqdm
 
 class Monitor(object):
     def __init__(
-        self,
-        llm_config: dict,
-        verbose: bool = False,
-        save_agents_debates: bool = False,
-        agents_instruction: dict = None,
-        min_opinion: int = 1,
-        max_opinion: int = 10,
-        **kwargs,
+            self,
+            llm_config: dict,
+            config_list: dict,
+            verbose: bool = False,
+            save_agents_debates: bool = False,
+            agents_instruction: dict = None,
+            min_opinion: int = 1,
+            max_opinion: int = 10,
+            **kwargs,
     ):
         """
         LLM Opinion Simulator Monitor.
@@ -30,6 +31,7 @@ class Monitor(object):
         self.agents = None
         self.statuses = {}
         self.llm_config = llm_config
+        self.config_list = config_list,
         self.verbose = verbose
         self.save_agents_debates = save_agents_debates
         self.agents_instruction = agents_instruction
@@ -71,7 +73,7 @@ class Monitor(object):
                 agent_2 = self.agents.get_random_agent()
             else:
                 agent_2 = agent_1.get_random_neighbor()
-            new_status, text = self.debate(agent_1, agent_2, theme)
+            new_status, text, discussant_text = self.debate(agent_1, agent_2, theme)
             if new_status is None:
                 new_status = self.statuses[n1]
 
@@ -82,18 +84,25 @@ class Monitor(object):
                 yield {
                     "interacting_agents": {
                         "discussant": n1,
+                        "discussant_llm": agent_1.get_llm_name(),
                         "opponent": agent_2.name,
+                        "opponent_llm": agent_2.get_llm_name(),
+                        "discussant_opinion": original_status,
                         "opponent_opinion": self.statuses[agent_2.name],
                     },
                     "opinion_variation": new_status - original_status,
                     "opponent_statement": text,
+                    "discussant_answer": discussant_text,
                     "status": {**self.statuses},
                 }
             else:
                 yield {
                     "interacting_agents": {
                         "discussant": n1,
+                        "discussant_llm": agent_1.get_llm_name(),
                         "opponent": agent_2.name,
+                        "opponent_llm": agent_2.get_llm_name(),
+                        "discussant_opinion": original_status,
                         "opponent_opinion": self.statuses[agent_2.name],
                     },
                     "opinion_variation": new_status - original_status,
@@ -138,12 +147,12 @@ class Monitor(object):
                 You are a human being allowed to have his own opinions.
                 In a scale from {self.min_opinion} to {self.max_opinion}, where {self.min_opinion} = "I fully disagree" and {self.max_opinion} = "I totally agree", 
                 your initial opinion toward the proposed discussion topic is {self.statuses[discussant.name]}.
-                
+
                 Task:
                 - Listen to the opinions of {opponent.name} on the topic discussed and, if convinced, update your own. 
                 - You can always maintain your initial opinion if {opponent.name} message is shallow.
                 - Do not drastically change your opinion (e.g., {self.min_opinion} to {self.max_opinion} or {self.max_opinion} to {self.min_opinion} are not allowed).
-                
+
                 Constraints:
                 - At the end of each interaction write the value of your updated opinion in the following format: 
                   "My opinion is X", where X is an integer between {self.min_opinion} and {self.max_opinion}. No additional text is allowed.
@@ -158,12 +167,12 @@ class Monitor(object):
                 [INST]
                 In a scale from {self.min_opinion} to {self.max_opinion}, where {self.min_opinion} = "I fully disagree" and {self.max_opinion} = "I totally agree", 
                 your initial opinion on the proposed topic is {self.statuses[opponent.name]}.
-                
+
                 Task:
                 - Support your opinion by providing arguments.
                 - Your arguments should be as convincing as possible and MUST support an opinion of {self.statuses[opponent.name]} 
                   for the proposed topic.
-                    
+
                 Constraints:
                 - Stick to your initial opinion while presenting your arguments.
                 - You cannot change your opinion while trying to persuade {discussant.name}.
@@ -175,9 +184,15 @@ class Monitor(object):
         else:
             u1_instruction = self.agents_instruction["discussant"].format(**locals())
 
+            llm_conf0 = {k: v for k, v in self.llm_config.items()}
+            llm_conf1 = {k: v for k, v in self.llm_config.items()}
+
+            llm_conf0['config_list'] = [self.config_list[0][discussant.get_llm_name()]]
+            llm_conf1['config_list'] = [self.config_list[0][opponent.get_llm_name()]]
+
             u1 = AssistantAgent(
                 name=f"{discussant.name}",
-                llm_config=self.llm_config,
+                llm_config=llm_conf0,#self.llm_config,
                 system_message=u1_instruction,
                 max_consecutive_auto_reply=1,
             )
@@ -187,7 +202,7 @@ class Monitor(object):
             u2 = AssistantAgent(
                 name=f"{opponent.name}",
                 system_message=u2_instruction,
-                llm_config=self.llm_config,
+                llm_config=llm_conf1,#self.llm_config,
                 max_consecutive_auto_reply=1,
             )
 
@@ -208,15 +223,15 @@ class Monitor(object):
         ds = self.statuses[discussant.name]
 
         if op == ds:  # no change same opinion
-            return ds, text
+            return ds, text, final_text
 
         gt = op > ds
-        if 'NO' in final_text:
+        if 'refuse' in final_text.lower():
             if gt:
                 new_op = max(ds - 1, self.min_opinion)
             else:
                 new_op = min(ds + 1, self.max_opinion)
-        elif 'YES' in final_text:
+        elif 'support' in final_text.lower():
             if gt:
                 new_op = min(ds + 1, self.max_opinion)
             else:
@@ -224,5 +239,5 @@ class Monitor(object):
         else:
             new_op = ds
 
-        return new_op, text
+        return new_op, text, final_text
 

@@ -8,6 +8,7 @@ class LLMOpinionSimulator(object):
     def __init__(
         self,
         llm_config: dict,
+        config_list: dict,
         verbose: bool = False,
         save_agents_debates: bool = False,
         monitor_type: str = "Monitor",
@@ -30,6 +31,7 @@ class LLMOpinionSimulator(object):
 
         self.monitor = monitor(
             llm_config,
+            config_list,
             verbose=False,
             save_agents_debates=save_agents_debates,
             agents_instruction=agents_instruction,

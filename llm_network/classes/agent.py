@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Agent(object):
-    def __init__(self, name: str, status: int = None, **kwargs):
+    def __init__(self, name: str, status: int = None, llm_name: str = "llama3", **kwargs):
         """
         Initialize the Agent object.
 
@@ -14,6 +14,7 @@ class Agent(object):
         self.profile = kwargs
         self.neighbors = {}
         self.status = status
+        self.llm_name = llm_name
         self.args = kwargs
 
     def get_status(self) -> int:
@@ -32,13 +33,29 @@ class Agent(object):
         """
         self.status = status
 
+    def set_llm_name(self, llm_name: str):
+        """
+        Set the name of the LLM model
+
+        :param llm_name: name of the LLM model
+        """
+        self.llm_name = llm_name
+
+    def get_llm_name(self) -> str:
+        """
+        Get the name of the LLM model
+
+        :return: name of the LLM model
+        """
+        return self.llm_name
+
     def __str__(self) -> str:
         """
         Return a string representation of the Profile object.
 
         :return: agent representation
         """
-        return f"Name: {self.name}, Status: {self.status}"
+        return f"Name: {self.name}, Status: {self.status}, LLM: {self.llm_name}"
 
     def __dict__(self) -> dict:
         """
