@@ -2,7 +2,9 @@ import numpy as np
 
 
 class Agent(object):
-    def __init__(self, name: str, status: int = None, llm_name: str = "llama3", **kwargs):
+    def __init__(
+        self, name: str, status: int = None, llm_name: str = "llama3", **kwargs
+    ):
         """
         Initialize the Agent object.
 

@@ -1,6 +1,6 @@
 [
-  {"name":  "a1", "status": 3, "epsilon":  2},
-  {"name":  "a2", "status": 5, "epsilon":  3},
-  {"name":  "a3", "status": 7, "epsilon":  2},
-  {"name":  "a4", "status": 9, "epsilon":  3}
+    {"name": "a1", "status": 3, "epsilon": 2},
+    {"name": "a2", "status": 5, "epsilon": 3},
+    {"name": "a3", "status": 7, "epsilon": 2},
+    {"name": "a4", "status": 9, "epsilon": 3}
 ]

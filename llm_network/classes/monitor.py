@@ -7,15 +7,15 @@ import tqdm
 
 class Monitor(object):
     def __init__(
-            self,
-            llm_config: dict,
-            config_list: dict,
-            verbose: bool = False,
-            save_agents_debates: bool = False,
-            agents_instruction: dict = None,
-            min_opinion: int = 1,
-            max_opinion: int = 10,
-            **kwargs,
+        self,
+        llm_config: dict,
+        config_list: dict,
+        verbose: bool = False,
+        save_agents_debates: bool = False,
+        agents_instruction: dict = None,
+        min_opinion: int = 1,
+        max_opinion: int = 10,
+        **kwargs,
     ):
         """
         LLM Opinion Simulator Monitor.
@@ -31,7 +31,7 @@ class Monitor(object):
         self.agents = None
         self.statuses = {}
         self.llm_config = llm_config
-        self.config_list = config_list,
+        self.config_list = (config_list,)
         self.verbose = verbose
         self.save_agents_debates = save_agents_debates
         self.agents_instruction = agents_instruction
@@ -74,7 +74,9 @@ class Monitor(object):
             else:
                 agent_2 = agent_1.get_random_neighbor()
 
-            new_status, new_status_opponent, text, discussant_text, text2 = self.debate(agent_1, agent_2, theme)
+            new_status, new_status_opponent, text, discussant_text, text2 = self.debate(
+                agent_1, agent_2, theme
+            )
             if new_status is None:
                 new_status = self.statuses[n1]
 
@@ -100,7 +102,8 @@ class Monitor(object):
                         "opponent_opinion": original_status_opponent,
                     },
                     "opinion_variation_discussant": new_status - original_status,
-                    "opinion_variation_opponent": new_status_opponent - original_status_opponent,
+                    "opinion_variation_opponent": new_status_opponent
+                    - original_status_opponent,
                     "opponent_statement": text,
                     "discussant_answer": discussant_text,
                     "opponent_answer": text2,
@@ -117,7 +120,8 @@ class Monitor(object):
                         "opponent_opinion": original_status_opponent,
                     },
                     "opinion_variation_discussant": new_status - original_status,
-                    "opinion_variation_opponent": new_status_opponent - original_status_opponent,
+                    "opinion_variation_opponent": new_status_opponent
+                    - original_status_opponent,
                     "status": {**self.statuses},
                 }
 
@@ -199,12 +203,12 @@ class Monitor(object):
             llm_conf0 = {k: v for k, v in self.llm_config.items()}
             llm_conf1 = {k: v for k, v in self.llm_config.items()}
 
-            llm_conf0['config_list'] = [self.config_list[0][discussant.get_llm_name()]]
-            llm_conf1['config_list'] = [self.config_list[0][opponent.get_llm_name()]]
+            llm_conf0["config_list"] = [self.config_list[0][discussant.get_llm_name()]]
+            llm_conf1["config_list"] = [self.config_list[0][opponent.get_llm_name()]]
 
             u1 = AssistantAgent(
                 name=f"{discussant.name}",
-                llm_config=llm_conf0,#self.llm_config,
+                llm_config=llm_conf0,  # self.llm_config,
                 system_message=u1_instruction,
                 max_consecutive_auto_reply=1,
             )
@@ -214,7 +218,7 @@ class Monitor(object):
             u2 = AssistantAgent(
                 name=f"{opponent.name}",
                 system_message=u2_instruction,
-                llm_config=llm_conf1,#self.llm_config,
+                llm_config=llm_conf1,  # self.llm_config,
                 max_consecutive_auto_reply=2,
             )
 
@@ -243,25 +247,29 @@ class Monitor(object):
             return ds, op, text1_opponent, final_text_discussant, text2_opponent
 
         gt = op > ds
-        if 'reject' in final_text_discussant.lower().split():
+        if "reject" in final_text_discussant.lower().split():
             if gt:
                 new_op = max(ds - 1, self.min_opinion)
             else:
                 new_op = min(ds + 1, self.max_opinion)
 
-            if 'accept' in text2_opponent.lower().split():  # update opponent status if needed (convinced)
+            if (
+                "accept" in text2_opponent.lower().split()
+            ):  # update opponent status if needed (convinced)
                 if gt:
                     new_op_opponent = max(op - 1, self.min_opinion)
                 else:
                     new_op_opponent = min(op + 1, self.max_opinion)
 
-            if 'reject' in text2_opponent.lower().split():  # update opponent status if needed (backfire)
+            if (
+                "reject" in text2_opponent.lower().split()
+            ):  # update opponent status if needed (backfire)
                 if gt:
                     new_op_opponent = min(op + 1, self.max_opinion)
                 else:
                     new_op_opponent = max(op - 1, self.min_opinion)
 
-        elif 'accept' in final_text_discussant.lower().split():
+        elif "accept" in final_text_discussant.lower().split():
             if gt:
                 new_op = min(ds + 1, self.max_opinion)
             else:
@@ -269,5 +277,10 @@ class Monitor(object):
         else:
             new_op = ds
 
-        return new_op, new_op_opponent, text1_opponent, final_text_discussant, text2_opponent
-
+        return (
+            new_op,
+            new_op_opponent,
+            text1_opponent,
+            final_text_discussant,
+            text2_opponent,
+        )

@@ -70,7 +70,6 @@ class LLMOpinionSimulator(object):
             for it in iterations:
                 it_count += 1
                 for i in it:
-                    i['iteration'] = it_count
+                    i["iteration"] = it_count
                     f.write(f"{json.dumps(i)}\n")
                     f.flush()
-

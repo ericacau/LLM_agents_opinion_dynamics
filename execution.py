@@ -14,20 +14,15 @@ def execute(model, config_list, theme, network, n, name):
         "temperature": 0.9,
     }
 
-    print(os.getcwd())
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(
-        f"sample_data/agents_140_llm_{model}.json"
-    )
+    net.add_agents(f"sample_data/agents_140_llm_{model}.json")
 
     if network is not None:
         net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
-    instructions = json.load(
-        open("sample_data/agents_instructions_Theseus.json")
-    )
+    instructions = json.load(open("sample_data/agents_instructions_Theseus.json"))
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
     # run the simulation
@@ -76,8 +71,5 @@ if __name__ == "__main__":
     if network is not None:
         network = nx.read_edgelist(f"networks/{network}", delimiter=",", nodetype=str)
 
-
     for n in range(run_n):
         execute(model, config_list, theme, network, n, theme_name)
-
-

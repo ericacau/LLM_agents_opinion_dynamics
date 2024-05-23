@@ -4,5 +4,3 @@ filename = "results/old/Theseus_mistral_run1_backfire.jsonl"
 
 img = OpinionTrends(filename)
 img.plot("Theseus_mistral_run1.png")
-
-
