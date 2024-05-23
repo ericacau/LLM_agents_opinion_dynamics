@@ -41,7 +41,7 @@ def execute(model, config_list, theme, network, n, name):
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{name}_{model}_{n}.jsonl",
+        output_file=f"results/{name.split('.')[0]}_{model}_{n}.jsonl",
     )
 
 

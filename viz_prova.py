@@ -1,6 +1,12 @@
 from llm_network.viz import OpinionEvolution, OpinionTrends
+import os.path
 
-filename = "results/old/Theseus_mistral_run1_backfire.jsonl"
 
-img = OpinionTrends(filename)
-img.plot("Theseus_mistral_run1.png")
+for i in range(3):
+    for m in ['llama3', 'mistral']:
+        for c in ["same", "different"]:
+            filename = f"results/theseus_{c}_{m}_{i}.jsonl"
+            if os.path.exists(filename):
+                img = OpinionTrends(filename)
+                img.plot(f"trends/theseus_{c}_{m}_{i}.png")
+
