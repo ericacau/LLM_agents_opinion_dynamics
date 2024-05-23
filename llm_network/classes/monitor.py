@@ -249,11 +249,17 @@ class Monitor(object):
             else:
                 new_op = min(ds + 1, self.max_opinion)
 
-            if 'accept' in text2_opponent.lower().split():  # update opponent status if needed
+            if 'accept' in text2_opponent.lower().split():  # update opponent status if needed (convinced)
                 if gt:
                     new_op_opponent = max(op - 1, self.min_opinion)
                 else:
                     new_op_opponent = min(op + 1, self.max_opinion)
+
+            if 'reject' in text2_opponent.lower().split():  # update opponent status if needed (backfire)
+                if gt:
+                    new_op_opponent = min(op + 1, self.max_opinion)
+                else:
+                    new_op_opponent = max(op - 1, self.min_opinion)
 
         elif 'accept' in final_text_discussant.lower().split():
             if gt:

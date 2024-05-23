@@ -1,26 +1,11 @@
 from llm_network.simulator import LLMOpinionSimulator
 import llm_network as llmn
 import json
+import sys
+import os
 
-if __name__ == "__main__":
-    # Simple example
 
-    # Create a configuration
-    config_list = {"llama3": {
-            "model": "llama3",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-            "api_base": "http://127.0.0.1:11434/v1",  # 8000
-            "api_type": "open_ai",
-            "api_key": "NULL",
-        },
-
-       # "mistral": {
-       #     "model": "mistral",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-       #     "api_base": "http://127.0.0.1:11434/v1",  # 8000
-       #     "api_type": "open_ai",
-       #     "api_key": "NULL",
-       # }
-    }
-
+def execute(model, config_list, theme, network, n, name):
     llm_config = {
         "config_list": None,
         "seed": 42,
@@ -29,18 +14,15 @@ if __name__ == "__main__":
         "temperature": 0.9,
     }
 
-    theme = ["""Theseus set sail to reclaim the throne as king of Athens. During the journey, parts of Theseus's ship began to break or decay; 
-                Theseus and his crew replaced these parts as they sailed. Eventually, each part of the ship is replaced. 
-                In the end the Ship of Theseus is still the same ship on which he originally sailed."""]
-
+    print(os.getcwd())
     # Create a network of agents from files
     net = llmn.Network()
     net.add_agents(
-        "sample_data/agents_100_llm_llama3.json"
+        f"sample_data/agents_140_llm_{model}.json"
     )
 
-    # g = nx.read_edgelist("../sample_data/example_net.csv", delimiter=",", nodetype=str)
-    # net.set_network(g)
+    if network is not None:
+        net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
     instructions = json.load(
@@ -62,7 +44,40 @@ if __name__ == "__main__":
     )
     sim.set_agents(net)
     sim.run(
-        n_iterations=1000,
+        n_iterations=100,
         themes=theme,
-        output_file="results/Theseus_llama3.jsonl",
+        output_file=f"results/{name}_{model}_{n}.jsonl",
     )
+
+
+if __name__ == "__main__":
+    # Simple example
+
+    model = sys.argv[1]
+    run_n = int(sys.argv[2])
+    theme_name = sys.argv[3]
+    try:
+        network = sys.argv[4]
+    except IndexError:
+        network = None
+
+    # Create a configuration
+    config_list = {
+        f"{model}": {
+            "model": f"{model}",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
+            "api_base": "http://127.0.0.1:11434/v1",  # 8000
+            "api_type": "open_ai",
+            "api_key": "NULL",
+        }
+    }
+
+    theme = json.load(open(f"themes/{theme_name}", "r"))
+
+    if network is not None:
+        network = nx.read_edgelist(f"networks/{network}", delimiter=",", nodetype=str)
+
+
+    for n in range(run_n):
+        execute(model, config_list, theme, network, n, theme_name)
+
+

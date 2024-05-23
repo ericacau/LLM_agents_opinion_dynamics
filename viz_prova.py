@@ -1,8 +1,8 @@
 from llm_network.viz import OpinionEvolution, OpinionTrends
 
-filename = "results/Theseus_llama3.jsonl"
+filename = "results/old/Theseus_mistral_run1_backfire.jsonl"
 
 img = OpinionTrends(filename)
-img.plot("Theseus_llama3.png")
+img.plot("Theseus_mistral_run1.png")
 
 

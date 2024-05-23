@@ -3,9 +3,9 @@ import json
 
 res = []
 
-with open("agents_100_llm_llama3.json", "w") as o:
+with open("agents_140_llm_llama3.json", "w") as o:
 
-    ags = json.load(open("agents_100.json"))
+    ags = json.load(open("agents_140.json"))
     for l in ags:
 
         if int(l["name"][1:]) % 2 == 0:
