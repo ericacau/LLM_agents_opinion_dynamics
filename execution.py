@@ -1,11 +1,11 @@
 from llm_network.simulator import LLMOpinionSimulator
 import llm_network as llmn
+import networkx as nx
 import json
 import sys
-import os
 
 
-def execute(model, config_list, theme, network, n, name):
+def execute(models, config_list, theme, network, n, name):
     llm_config = {
         "config_list": None,
         "seed": 42,
@@ -16,7 +16,7 @@ def execute(model, config_list, theme, network, n, name):
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(f"sample_data/agents_140_llm_{model}.json")
+    net.add_agents(f"sample_data/agents_140_llm_{models}.json")
 
     if network is not None:
         net.set_network(g)
@@ -41,14 +41,14 @@ def execute(model, config_list, theme, network, n, name):
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{name.split('.')[0]}_{model}_{n}.jsonl",
+        output_file=f"results/{name.split('.')[0]}_{models}_{n}.jsonl",
     )
 
 
 if __name__ == "__main__":
     # Simple example
 
-    model = sys.argv[1]
+    models = sys.argv[1]
     run_n = int(sys.argv[2])
     theme_name = sys.argv[3]
     try:
@@ -56,15 +56,17 @@ if __name__ == "__main__":
     except IndexError:
         network = None
 
+    model_list = models.split(",")
+
+    config_list = {}
+    for model in model_list:
     # Create a configuration
-    config_list = {
-        f"{model}": {
-            "model": f"{model}",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-            "api_base": "http://127.0.0.1:11434/v1",  # 8000
-            "api_type": "open_ai",
-            "api_key": "NULL",
-        }
-    }
+        config_list[model] = {
+                "model": f"{model}",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
+                "api_base": "http://127.0.0.1:11434/v1",  # 8000
+                "api_type": "open_ai",
+                "api_key": "NULL",
+            }
 
     theme = json.load(open(f"themes/{theme_name}", "r"))
 
@@ -72,4 +74,4 @@ if __name__ == "__main__":
         network = nx.read_edgelist(f"networks/{network}", delimiter=",", nodetype=str)
 
     for n in range(run_n):
-        execute(model, config_list, theme, network, n, theme_name)
+        execute(models, config_list, theme, network, n, theme_name)
