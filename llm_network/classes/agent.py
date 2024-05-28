@@ -1,5 +1,5 @@
 import numpy as np
-
+import random
 
 class Agent(object):
     def __init__(
@@ -174,5 +174,10 @@ class Agents(object):
 
         :return: an iterator over (name, Agent) pairs
         """
-        for k, v in self.agents.items():
+
+        l = list(self.agents.items())
+        random.shuffle(l)
+        d_shuffled = dict(l)
+
+        for k, v in d_shuffled.items():
             yield k, v
