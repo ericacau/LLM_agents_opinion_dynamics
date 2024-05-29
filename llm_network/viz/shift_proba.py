@@ -16,40 +16,11 @@ __email__ = "giulio.rossetti@gmail.com"
 
 
 class ShiftMatrix(object):
-    def __init__(self, filename: object):
-        """
-        :param model: The model object
-        :param trends: The computed simulation trends
-        """
 
-        self.data = {}
-        c = 0
-        with open(filename) as file:
+    def _manipulate(self, f, accept, reject, total):
+        with open(f) as file:
             file.readline()
-            accept = [[0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0]]
-
-            reject = [[0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0]]
-
-            total = [[0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0]]
-
+                    
             for l in file:
                 l = json.loads(l)
                 d_op = l['interacting_agents']['discussant_opinion']
@@ -68,14 +39,57 @@ class ShiftMatrix(object):
                 elif d_op < o_op and d_v_op == -1:
                     reject[d_op][o_op] += 1
 
-            for i in range(len(total)):
+            
+        return accept, reject, total
+
+    def __init__(self, filename: object):
+        """
+        :param model: The model object
+        :param trends: The computed simulation trends
+        """
+
+        self.data = {}
+        c = 0
+
+        accept = [[0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0]]
+
+        reject = [[0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0]]
+
+        total = [[0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0]]
+
+
+        if isinstance(filename, list):
+            for f in filename:
+                accept, reject, total = self._manipulate(f, accept, reject, total)
+                
+        else:
+            accept, reject, total = self._manipulate(filename, accept, reject, total)
+
+        for i in range(len(total)):
                 d = total[i]
                 for j in range(len(d)):
                     if d[j] > 0:
                         accept[i][j] /= d[j]
                         reject[i][j] /= d[j]
-
-            self.data = {"accept": accept, "reject": reject}
+        self.data = {"accept": accept, "reject": reject}
 
     def plot(self, filename=None, d="accept"):
         """
