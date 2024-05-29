@@ -26,12 +26,14 @@ class OpinionTrends(object):
         with open(filename) as file:
             old_iter = 0
             statuses = {}
-            for id_row, l in enumerate(file):
-                l = json.loads(l)
 
-                vals = l["status"]
-                # try:
+            print(filename)
+
+            for id_row, l in enumerate(file):
                 try:
+                    l = json.loads(l)
+                # try:
+
                     iter = l["iteration"]
                 except:
                     continue
