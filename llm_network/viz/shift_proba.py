@@ -16,30 +16,24 @@ __email__ = "giulio.rossetti@gmail.com"
 
 
 class ShiftMatrix(object):
-
     def _manipulate(self, f, accept, reject, total):
-        with open(f) as file:
-            file.readline()
-                    
-            for l in file:
-                l = json.loads(l)
-                d_op = l['interacting_agents']['discussant_opinion']
-                o_op = l['interacting_agents']['opponent_opinion']
-                d_v_op = l['opinion_variation_discussant']
+        data = json.load(open(f))
 
-                total[d_op][o_op] += 1
+        for l in data:
+            d_op = l[0]
+            o_op = l[1]
+            result = l[2]
 
-                if d_op > o_op and d_v_op == -1:
-                    accept[d_op][o_op] += 1
-                elif d_op < o_op and d_v_op == 1:
-                    accept[d_op][o_op] += 1
+            if d_op == o_op:
+                continue
 
-                if d_op > o_op and d_v_op == 1:
-                    reject[d_op][o_op] += 1
-                elif d_op < o_op and d_v_op == -1:
-                    reject[d_op][o_op] += 1
+            total[d_op][o_op] += 1
 
-            
+            if result == "accept":
+                accept[d_op][o_op] += 1
+            elif result == "reject":
+                reject[d_op][o_op] += 1
+
         return accept, reject, total
 
     def __init__(self, filename: object):
@@ -51,44 +45,49 @@ class ShiftMatrix(object):
         self.data = {}
         c = 0
 
-        accept = [[0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0]]
+        accept = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+        ]
 
-        reject = [[0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0],
-                            [0,0,0,0,0,0,0]]
+        reject = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+        ]
 
-        total = [[0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0]]
-
+        total = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+        ]
 
         if isinstance(filename, list):
             for f in filename:
                 accept, reject, total = self._manipulate(f, accept, reject, total)
-                
+
         else:
             accept, reject, total = self._manipulate(filename, accept, reject, total)
 
         for i in range(len(total)):
-                d = total[i]
-                for j in range(len(d)):
-                    if d[j] > 0:
-                        accept[i][j] /= d[j]
-                        reject[i][j] /= d[j]
+            d = total[i]
+            for j in range(len(d)):
+                if d[j] > 0:
+                    accept[i][j] /= d[j]
+                    reject[i][j] /= d[j]
         self.data = {"accept": accept, "reject": reject}
 
     def plot(self, filename=None, d="accept"):
@@ -101,38 +100,45 @@ class ShiftMatrix(object):
 
         fig, ax = plt.subplots()
         ax.matshow(self.data[d], cmap="Greys", extent=(0, 7, 7, 0))
-        ax.grid(color='w', linestyle='-', linewidth=2, which="minor")
+        ax.grid(color="w", linestyle="-", linewidth=2, which="minor")
 
-        #red box
+        # red box
         plt.hlines(-0, -0, 3, linewidth=4.5, color="red")
         plt.hlines(3, -0, 3, linewidth=3, color="red")
         plt.vlines(-0, -0, 3, linewidth=4.5, color="red")
-        plt.vlines(3, -0, 3, linewidth=3,  color="red")
+        plt.vlines(3, -0, 3, linewidth=3, color="red")
 
-        #greeen
+        # greeen
         plt.hlines(4, 4, 7, linewidth=3, color="green")
         plt.hlines(7, 4, 7, linewidth=4.5, color="green")
         plt.vlines(4, 4, 7, linewidth=3, color="green")
         plt.vlines(7, 4, 7, linewidth=4.5, color="green")
-        
-        #blue
+
+        # blue
         plt.hlines(0, 4, 7, linewidth=4.5, color="blue")
         plt.hlines(3, 4, 7, linewidth=3, color="blue")
         plt.vlines(4, -0, 3, linewidth=3, color="blue")
         plt.vlines(7, -0, 3, linewidth=4.5, color="blue")
 
-        #yellow
-        plt.hlines(4, 0, 3, linewidth=3,  color="yellow")
+        # yellow
+        plt.hlines(4, 0, 3, linewidth=3, color="yellow")
         plt.vlines(-0, 4, 7, linewidth=4.5, color="yellow")
-        plt.hlines(7, 0, 3, linewidth=4.5,  color="yellow")
+        plt.hlines(7, 0, 3, linewidth=4.5, color="yellow")
         plt.vlines(3, 4, 7, linewidth=3, color="yellow")
-        #print(self.data[d])
+        # print(self.data[d])
 
         for (i, j), z in np.ndenumerate(self.data[d]):
             if i != j:
-                ax.text(j+0.5, i+0.5, '{:0.2f}'.format(z), ha='center', va='center', bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'), size=7, alpha=0.8)
-
-        #ax.set_xticks([ 0.5, 1.5, 2.5, 3.5,  4.5,  5.5, 6.5])
+                ax.text(
+                    j + 0.5,
+                    i + 0.5,
+                    "{:0.2f}".format(z),
+                    ha="center",
+                    va="center",
+                    bbox=dict(boxstyle="round", facecolor="white", edgecolor="0.3"),
+                    size=7,
+                    alpha=0.8,
+                )
 
         major_ticks = np.arange(0.5, 7.5, 1)
         minor_ticks = np.arange(0, 7, 1)
@@ -141,22 +147,45 @@ class ShiftMatrix(object):
         ax.set_xticks(minor_ticks, minor=True)
         ax.set_yticks(major_ticks)
         ax.set_yticks(minor_ticks, minor=True)
-        
-        ax.set_xticklabels(["Strongly Disagree", "Disagree", 
-                            "Mildly Disagree", "Neutral", "Mildly Agree", 
-                            "Agree", "Fully Agree"], 
-                            ha="left", rotation=45, size=8)
-        
+
+        ax.set_xticklabels(
+            [
+                "Strongly\n Disagree",
+                "Disagree",
+                "Mildly\n Disagree",
+                "Neutral",
+                "Mildly\n Agree",
+                "Agree",
+                "Fully\n Agree",
+            ],
+            ha="left",
+            rotation=90,
+            size=8,
+        )
+
         ax.set_yticklabels(
-            ["Strongly Disagree", "Disagree", 
-             "Mildly Disagree", "Neutral", "Mildly Agree", 
-             "Agree", "Fully Agree"],
-            size=8, va="center")
+            [
+                "Strongly\n Disagree",
+                "Disagree",
+                "Mildly\n Disagree",
+                "Neutral",
+                "Mildly\n Agree",
+                "Agree",
+                "Fully\n Agree",
+            ],
+            size=8,
+            va="center",
+        )
+
+        ax.xaxis.set_ticks_position("bottom")
 
         plt.xlabel("Opponent")
         plt.ylabel("Discussant")
 
-        plt.title(f"Discussant {d} rate given Opponent stance")
+        model = filename.split("_")[-1].split(".")[0]
+        variant = filename.split("_")[-2]
+
+        plt.title(f"[{model}|{variant}] Discussant {d} rate given Opponent stance")
 
         plt.tight_layout()
         if filename is not None:

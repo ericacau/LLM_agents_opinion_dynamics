@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+
 class Agent(object):
     def __init__(
         self, name: str, status: int = None, llm_name: str = "llama3", **kwargs

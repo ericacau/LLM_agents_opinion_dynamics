@@ -32,7 +32,7 @@ class OpinionTrends(object):
             for id_row, l in enumerate(file):
                 try:
                     l = json.loads(l)
-                # try:
+                    # try:
 
                     iter = l["iteration"]
                 except:
