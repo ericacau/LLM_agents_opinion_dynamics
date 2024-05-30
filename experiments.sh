@@ -12,4 +12,8 @@
 #echo "mistral different"
 #python execution.py mistral 3 theseus_different.json
 
-python execution.py llama3,mistral 1 theseus_same.json
+
+python execution.py llama3 3 theseus_same.json
+python execution.py mistral 3 theseus_same.json
+python execution.py llama3 3 theseus_different.json
+python execution.py mistral 3 theseus_different.json

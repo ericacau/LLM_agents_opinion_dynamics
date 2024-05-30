@@ -16,7 +16,7 @@ def execute(models, config_list, theme, network, n, name):
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(f"sample_data/agents_140_llm_{models}.json")
+    net.add_agents(f"sample_data/agents_unbalanced_140_llm_{models}.json")
 
     if network is not None:
         net.set_network(g)
@@ -41,7 +41,7 @@ def execute(models, config_list, theme, network, n, name):
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{name.split('.')[0]}_{models}_{n}.jsonl",
+        output_file=f"results/{name.split('.')[0]}_{models}_{n}_unbalanced.jsonl",
     )
 
 
