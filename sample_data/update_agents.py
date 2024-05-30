@@ -2,14 +2,15 @@ import json
 
 
 res = []
+model = "mistral"
 
-with open("agents_unbalanced_140_llm_llama3.json", "w") as o:
+with open(f"agents_unbalanced_140_llm_{model}.json", "w") as o:
     ags = json.load(open("agents_unbalanced_140.json"))
     for l in ags:
         if int(l["name"][1:]) % 2 == 0:
-            l["llm_name"] = "llama3"
+            l["llm_name"] = model
         else:
-            l["llm_name"] = "llama3"
+            l["llm_name"] = model
 
         res.append(l)
 

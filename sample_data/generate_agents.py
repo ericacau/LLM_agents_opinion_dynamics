@@ -26,7 +26,7 @@ def generate_unbalanced_agents(n=140, opinions=7):
     b = int(n / opinions)
     current = 0
     op = 0
-    for i in range(80):
+    for i in range(81):
         agent = {"name": f"a{i}", "status": 0}
         #current = current + 1
 
