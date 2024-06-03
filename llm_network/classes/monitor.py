@@ -81,7 +81,7 @@ class Monitor(object):
                 new_status = self.statuses[n1]
 
             if new_status_opponent is None:
-                new_status_opponent = self.statuses[n2]
+                new_status_opponent = self.statuses[agent_2.name]
 
             original_status = self.statuses[n1]
             self.statuses[n1] = new_status

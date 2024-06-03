@@ -5,7 +5,17 @@ import json
 import sys
 
 
-def execute(models, config_list, theme, network, n, name):
+def execute(
+    models,
+    config_list,
+    network,
+    n,
+    name,
+    theme=None,
+    theme_name="theseus",
+    experiment="unbalanced",
+    n_agents=140,
+):
     llm_config = {
         "config_list": None,
         "seed": 42,
@@ -16,13 +26,14 @@ def execute(models, config_list, theme, network, n, name):
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(f"sample_data/agents_unbalanced_140_llm_{models}.json")
+    net.add_agents(f"sample_data/agents_{experiment}_{n_agents}_llm_{models}.json")
 
     if network is not None:
+        g = nx.read_edgelist(f"sample_data/{network}", nodetype=str)
         net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
-    instructions = json.load(open("sample_data/agents_instructions_Theseus.json"))
+    instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
     # run the simulation
@@ -41,7 +52,7 @@ def execute(models, config_list, theme, network, n, name):
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{name.split('.')[0]}_{models}_{n}_unbalanced.jsonl",
+        output_file=f"results/{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
 
 
@@ -51,22 +62,25 @@ if __name__ == "__main__":
     models = sys.argv[1]
     run_n = int(sys.argv[2])
     theme_name = sys.argv[3]
+    exp_name = sys.argv[4]
+    n_agents = int(sys.argv[5])
     try:
-        network = sys.argv[4]
+        network = sys.argv[6]
     except IndexError:
         network = None
 
     model_list = models.split(",")
 
     config_list = {}
+
+    # Create a configuration for each model
     for model in model_list:
-    # Create a configuration
         config_list[model] = {
-                "model": f"{model}",  # "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-                "api_base": "http://127.0.0.1:11434/v1",  # 8000
-                "api_type": "open_ai",
-                "api_key": "NULL",
-            }
+            "model": f"{model}",
+            "api_base": "http://127.0.0.1:11434/v1",
+            "api_type": "open_ai",
+            "api_key": "NULL",
+        }
 
     theme = json.load(open(f"themes/{theme_name}", "r"))
 
@@ -74,4 +88,13 @@ if __name__ == "__main__":
         network = nx.read_edgelist(f"networks/{network}", delimiter=",", nodetype=str)
 
     for n in range(run_n):
-        execute(models, config_list, theme, network, n, theme_name)
+        execute(
+            models=models,
+            config_list=config_list,
+            network=network,
+            n=n,
+            name=theme_name,
+            theme=theme,
+            experiment=exp_name,
+            n_agents=n_agents,
+        )
