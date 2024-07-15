@@ -19,7 +19,7 @@ def execute(
     llm_config = {
         "config_list": None,
         "seed": 42,
-        "request_timeout": 1200,
+        #"request_timeout": 1200,
         "max_tokens": -1,  # max response length, -1 no limits. Imposing limits may lead to truncated responses
         "temperature": 0.9,
     }
@@ -50,7 +50,7 @@ def execute(
     )
     sim.set_agents(net)
     sim.run(
-        n_iterations=100,
+        n_iterations=30,
         themes=theme,
         output_file=f"results/{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     for model in model_list:
         config_list[model] = {
             "model": f"{model}",
-            "api_base": "http://127.0.0.1:11434/v1",
+            "base_url": "http://edge-nd1.isti.cnr.it:11434/v1", #127.0.0.1
             "api_type": "open_ai",
             "api_key": "NULL",
         }
@@ -86,15 +86,19 @@ if __name__ == "__main__":
 
     if network is not None:
         network = nx.read_edgelist(f"networks/{network}", delimiter=",", nodetype=str)
-
-    for n in range(run_n):
-        execute(
-            models=models,
-            config_list=config_list,
-            network=network,
-            n=n,
-            name=theme_name,
-            theme=theme,
-            experiment=exp_name,
-            n_agents=n_agents,
-        )
+    try:
+        for n in range(0, run_n):
+            execute(
+                models=models,
+                config_list=config_list,
+                network=network,
+                n=n,
+                name=theme_name,
+                theme=theme,
+                experiment=exp_name,
+                n_agents=n_agents,
+            )
+    except Exception as e:
+        print(e)
+        print("Error in the execution")
+        sys.exit(1)

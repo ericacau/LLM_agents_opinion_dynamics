@@ -4,7 +4,7 @@ for m in ["llama3", "mistral"]:
     for c in ["same", "different"]:
         shifts = []
         for i in range(3):
-            filename = f"results/theseus_{c}_{m}_{i}.jsonl"
+            filename = f"results/theseus_{c}_{m}_{i}_polarized.jsonl"
 
             with open(filename, "r") as f:
                 f.readline()
@@ -28,5 +28,5 @@ for m in ["llama3", "mistral"]:
                     except:
                         pass
 
-        with open(f"results/theseus_{c}_{m}_shifts.json", "w") as f:
+        with open(f"results/theseus_{c}_{m}_polarized_shifts.json", "w") as f:
             f.write(json.dumps(shifts))

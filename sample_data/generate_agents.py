@@ -49,7 +49,21 @@ def generate_unbalanced_agents(n=140, opinions=7):
     return res
 
 
+def generate_polarized_agents(n=140, opinions=7):
+    res = []
+
+    for i in range(71):
+        agent = {"name": f"a{i}", "status": 0}
+        res.append(agent)
+
+    for i in range(71, n):
+        agent = {"name": f"a{i}", "status": 6}
+        res.append(agent)
+
+    return res
+
+
 if __name__ == "__main__":
     n = 140
-    agents = generate_unbalanced_agents(n=n, opinions=7)
-    json.dump(agents, open(f"agents_unbalanced_{n}.json", "w"))
+    agents = generate_polarized_agents(n=n, opinions=7)
+    json.dump(agents, open(f"agents_polarized_{n}.json", "w"))
