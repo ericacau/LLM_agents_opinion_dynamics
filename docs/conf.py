@@ -33,7 +33,7 @@ MOCK_MODULES = [
     "matplotlib",
     "numpy",
     "scipy",
-    "pyautogen",
+    "ag2",
     "autogen",
     "networkx",
     "tqdm",

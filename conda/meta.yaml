@@ -15,7 +15,7 @@ requirements:
     - setuptools
     - networkx>=3.10
     - tqdm
-    - pyautogen
+    - ag2
   build:
     - python
     - setuptools
@@ -24,7 +24,7 @@ requirements:
     - python>=3.10
     - networkx>=3.10
     - tqdm
-    - pyautogen
+    - ag2
 
 about:
   home: "https://github.com/giuliorossetti/LLM_Network"
