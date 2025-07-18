@@ -2,5 +2,5 @@ name: package_name
 dependencies:
 - python>=3.10
 - networkx>=3.0
-- pyautogen
+- ag2
 - tqdm
